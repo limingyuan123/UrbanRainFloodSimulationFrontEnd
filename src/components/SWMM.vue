@@ -215,5 +215,7 @@ export default {
   text-align: center;
   z-index: 10000;
   position: absolute;
+  bottom: 70px;
+  width: 30%;
 }
 </style>
