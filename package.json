@@ -1,0 +1,33 @@
+{
+  "name": "vuethree",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "@mapbox/mapbox-gl-language": "^1.0.0",
+    "core-js": "^3.6.5",
+    "element-plus": "^2.1.8",
+    "jquery": "^3.6.0",
+    "leaflet": "^1.7.1",
+    "leaflet.pm": "^2.2.0",
+    "mapbox-gl": "^2.7.1",
+    "vue": "^3.2.31",
+    "vue-router": "^4.0.0-0",
+    "vuex": "^4.0.2"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.12",
+    "@vue/cli-plugin-router": "~4.5.12",
+    "@vue/cli-plugin-vuex": "~4.5.12",
+    "@vue/cli-service": "~4.5.12",
+    "@vue/compiler-sfc": "^3.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
