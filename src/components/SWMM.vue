@@ -106,8 +106,8 @@ export default {
       activeName: "first",
       dispArr: [],
       dispJSON: {},
-      date: [],
-      timeSlider: 0,
+/*      date: [],*/
+      timeSlider: 2,
       maxSlider: 10,
       marks: {},
       startBtn: true,
