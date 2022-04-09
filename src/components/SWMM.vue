@@ -218,4 +218,7 @@ export default {
   bottom: 70px;
   width: 30%;
 }
+#test{
+  position: inherit;
+}
 </style>
