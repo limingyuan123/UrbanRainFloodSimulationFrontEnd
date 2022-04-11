@@ -11,9 +11,15 @@ import 'leaflet.pm/dist/leaflet.pm.css'
 import $ from 'jquery';
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import VueCodeHighlight from 'vue-code-highlight';
+import 'vue-code-highlight/themes/prism-coy.css'
+
+
+
 window.jQuery = $;
 window.$ = $;
 
 
 
-createApp(App).use(store).use(router).use(ElementPlus).use(VueAxios, axios).mount('#app')
+createApp(App).use(store).use(router).use(ElementPlus)
+.use(VueAxios, axios).use(VueCodeHighlight).mount('#app')
