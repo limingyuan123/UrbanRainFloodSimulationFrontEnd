@@ -63,7 +63,7 @@
           >
         </h2>
         <p data-v-0ef2f3f6="" class="footerBottom" style="margin-top: 1px;">
-          Copyright © 2013-2020 OpenGMS. All rights reserved.
+          Copyright © 2013-2022 OpenGMS. All rights reserved.
         </p>
       </footer>
     </div>
