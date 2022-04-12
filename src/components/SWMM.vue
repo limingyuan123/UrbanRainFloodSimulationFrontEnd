@@ -107,7 +107,7 @@ export default {
       dispArr: [],
       dispJSON: {},
 /*      date: [],*/
-      timeSlider: 2,
+      timeSlider: 0,
       maxSlider: 10,
       marks: {},
       startBtn: true,
@@ -175,6 +175,9 @@ export default {
       this.curDateIndex = val;
     },
     formatTooltip(val) {},
+    changeResult(e){
+      
+    },
     startAnimation() {
       this.startBtn = true;
       this.pauseBtn = false;
