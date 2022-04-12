@@ -40,11 +40,11 @@
           <i class="el-icon-setting" style="margin-right:10px;color:#08b1f6"></i>
           <strong>模型模块化耦合控制区</strong>
         </div>
-        <p style="text-align:left">模型对象化模块体系文档</p>
+        <p class="paragraph">模型对象化模块体系文档</p>
         <div class="coupleDoc">
           <p v-show="modelConfig.length===0">模型文档未载入...</p>
           <el-card v-for="(item, index) in modelConfig" :key="index" style="margin:2px;">
-            <p>模型名称： {{ item.name }}</p>
+            <p class="paragraph">模型名称： {{ item.name }}</p>
             <el-divider></el-divider>
             <p style="float:left;margin-top:10px;">{{item.name}}配置文件: </p>
             <div style="text-align:center;vertical-align:middle;">
@@ -69,7 +69,7 @@
         style="margin:10px;position:relative;left: 40%;top: 20px;"
         @click="invoke()"
         ><el-icon style="margin-right:5px"><pointer /></el-icon>调用</el-button>
-        <p style="text-align:left">结果输出</p>
+        <p class="paragraph">结果输出</p>
         <div class="coupleDoc">
           <p v-show="!isShow">暂无运行结果...</p>
           <div v-show="isShow" >
@@ -83,9 +83,10 @@
                         :value="item.value">
                       </el-option>
                     </el-select>
-                    <el-button class="el-icon-download" style="margin:5px;" 
-                type="primary"  circle></el-button>
-                <el-button class="el-icon-view" style="margin:5px" type="primary"  circle></el-button>
+                    <el-button style="margin:5px;" type="primary"  
+                    circle><el-icon><bottom /></el-icon></el-button>
+                    <el-button style="margin:5px" type="primary"
+                    circle><el-icon><video-play /></el-icon></el-button>
                   </el-form-item>
                 </el-form>            
               </el-card>
@@ -98,7 +99,9 @@
           plain
           style="margin:10px;position:relative;left: 40%;top: 20px;"
           @click="showCouple()"
-          >耦合结果展示</el-button>
+          >
+          <router-link to="couple">耦合结果展示</router-link>
+          </el-button>
          
       </el-card>
     </div>
@@ -190,7 +193,7 @@
 <script>
 // import vkbeautify from "vkbeautify";
 import Navbar  from '../components/Navbar'
-import { UploadFilled,Bottom,Pointer } from '@element-plus/icons-vue'
+import { UploadFilled,Bottom,Pointer,View,VideoPlay } from '@element-plus/icons-vue'
 export default {
   name:"Operation",
   components:{
@@ -198,6 +201,8 @@ export default {
     UploadFilled,
     Bottom,
     Pointer,
+    View,
+    VideoPlay,
   },
   data() {
     return {
@@ -268,16 +273,21 @@ export default {
         },
       ],
       modelSelectStatus:'选择',
+      uploadFiles:[],
     };
   },
   methods: {
+    //关闭dialogVisible对话框
     handleClose(done) {
       this.dialogVisible = false;
     },
+    //关闭deployDocument对话框
     handleCloseDeployDocument(done) {
       this.deployDocument = false;
     },
+    //搜索模型
     searchModelItem() {},
+    //选择需要耦合的模型
     selectModelItem(index, info) {
       let modelObj = {
         oid:info.oid,
@@ -292,6 +302,7 @@ export default {
       })
       info.select = !info.select;
     },
+    //载入已选的模型
     loadModelItem(index, info) {
       this.xml_show = '';
       this.fileList = '';
@@ -306,16 +317,34 @@ export default {
     },
     //调用上传的删除方法，清除上传文件列表
     clearFiles(){
-      this.$refs['configUpload'].clearFiles();
+      if(this.$refs['configUpload'] !== undefined){        
+        this.$refs['configUpload'].clearFiles();
+      }
     },
     //上传文件，并展示内容到页面上
     uploadChange(file, fileList) {
-      this.uploadFiles = fileList;
+      if (file.status !== 'ready') return;
+      let fileObj = {
+        file:fileList,
+        name:this.loadModel.name,
+        description:this.loadModel.description,
+        author:this.loadModel.author,        
+      }
+      this.uploadFiles.push(fileObj);
       
       let _this = this;
       let form = new FormData();
       for (let i = 0; i < this.uploadFiles.length; i++) {
+        //上传文件信息以及模型信息
         form.append("datafile", this.uploadFiles[i].raw);
+      }
+
+      for(let item of this.uploadFiles){
+        //上传文件信息以及模型信息
+        form.append("datafile", item.file[0].raw);
+        form.append("name", item.name);
+        form.append("description", item.description);
+        form.append("author", item.author);
       }
 
       this.axios.post("/api/coupleDocument", form).then(res => {
@@ -349,6 +378,7 @@ export default {
       //根据文件路径，调用exe，生成最终结果，并可视化
       let _this = this;
       _this.loading = true;
+
       //获取配置文件路径
       //根据路径，调用exe
       //生成数据，存储起来，提供下载
@@ -357,6 +387,7 @@ export default {
         _this.isShow = true;
       }, 1000);
     },
+    //跳转到couple组件
     showCouple(){
 
     },
@@ -387,5 +418,9 @@ export default {
   border-width: 2px;
   border-radius: 10px;
 }
-
+.paragraph{
+  text-align:left;
+  font-style:italic;
+  font-weight: 800;
+}
 </style>
