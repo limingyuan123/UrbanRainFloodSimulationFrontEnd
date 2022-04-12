@@ -153,6 +153,14 @@ export default {
       //   this.$refs['upload'].clearFiles();
       this.fileList = [];
       this.fileDialog = true;
+      this.axios.get("quo_5.disp")
+      .then(res => {
+        console.log(res)
+        
+      })
+      .catch(err => {
+        console.error(err); 
+      })
     },
     handleClick() {},
     confirmLoad() {},
@@ -175,9 +183,6 @@ export default {
       this.curDateIndex = val;
     },
     formatTooltip(val) {},
-    changeResult(e){
-      
-    },
     startAnimation() {
       this.startBtn = true;
       this.pauseBtn = false;

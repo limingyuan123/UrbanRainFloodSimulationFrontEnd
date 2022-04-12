@@ -7,6 +7,7 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^1.1.4",
     "@mapbox/mapbox-gl-language": "^1.0.0",
     "axios": "^0.26.1",
     "core-js": "^3.6.5",
@@ -16,6 +17,8 @@
     "leaflet.pm": "^2.2.0",
     "mapbox-gl": "^2.7.1",
     "vue": "^3.2.31",
+    "vue-axios": "^3.4.1",
+    "vue-code-highlight": "^0.7.8",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.2"
   },
