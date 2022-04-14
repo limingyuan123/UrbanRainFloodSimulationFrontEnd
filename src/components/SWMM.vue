@@ -90,6 +90,7 @@
 <script>
 //样式引入
 import "mapbox-gl/dist/mapbox-gl.css";
+import "mapbox-gl";
 import { toRaw } from "@vue/reactivity";
 //定义变量使用
 const mapboxgl = require("mapbox-gl");
@@ -120,6 +121,7 @@ export default {
       /*      date: [],*/
       timeSlider: 0,
       timeSliderMap: true,
+      layerNumber: 0,
       nodemin: 0,
       nodestep: 1,
       linkmin: 0,
@@ -167,7 +169,7 @@ export default {
         center: [120.845998, 31.037172],
         zoom: 15,
       });
-
+      console.log(this.map.on);
       //注册点击事件
       this.map.on("click", function (e) {
         console.log("点击");
@@ -370,15 +372,16 @@ export default {
         var max = this.rptResult.MaxMin.link.maxCapacity;
         this.linkstep = (max - this.linkmin) / 5;
       }
-      console.log(this.options)
-      this.map.setView(
-        new mapboxgl.View({
-          projection: "EPSG:4326",
-          // center: this.geojsonObject.features[0].geometry.coordinates,
-          center: [120.845, 31.037],
-          zoom: 14,
-        })
-      );
+      // this.map.setView(
+      //   new mapboxgl.View({
+      //     projection: "EPSG:4326",
+      //     // center: this.geojsonObject.features[0].geometry.coordinates,
+      //     center: [120.845, 31.037],
+      //     zoom: 14,
+      //   })
+      // )
+      this.map.setZoom(14);
+      this.map.setCenter({ lng: 120.845, lat: 31.037 });
 
       // 更新openlayer
       // this.refreshOpenlayer()
@@ -395,7 +398,6 @@ export default {
     uploadChange(file, fileList) {
       this.uploadFiles = fileList;
     },
-    setView() {},
     //将展示的geojson加载入cesium
     addGeoJson(json) {},
     changeEcharts(dispResult) {},
@@ -404,17 +406,19 @@ export default {
     loadFenhuLayer(flag, year, reload) {},
     //时间线变动函数
     sliderChange(val) {
-       this.numberAnima = val-1
-      for (let i = 0; i < this.rptResult.Node.length; i++) {// 更新geojsonObject
+      this.numberAnima = val - 1;
+      for (let i = 0; i < this.rptResult.Node.length; i++) {
+        // 更新geojsonObject
         var feat = this.geojsonObject.features[i];
-        feat.properties.value = this.nodeResultArr[i][this.numberAnima]
+        feat.properties.value = this.nodeResultArr[i][this.numberAnima];
       }
-      for (let k = 0; k < this.rptResult.Link.length; k++) {// 更新geojsonObject
+      for (let k = 0; k < this.rptResult.Link.length; k++) {
+        // 更新geojsonObject
         var feat = this.geojsonObject.features[this.rptResult.Node.length + k];
-        feat.properties.value = this.linkResultArr[k][this.numberAnima]
+        feat.properties.value = this.linkResultArr[k][this.numberAnima];
       }
       // 更新openlayer
-      this.refreshOpenlayer()
+      this.refreshOpenlayer();
     },
     refreshOpenlayer() {
       var that = this;
@@ -563,23 +567,41 @@ export default {
         this.vectorLayer.setStyle(styleFunction);
       } else {
         // 第一次不能从变量里加载，会出现错位问题，原因未知
-        var vectorSource = new mapboxgl.source.Vector({
-          projection: "EPSG:4326",
-          url: "./" + this.dataName + "/" + this.dataName + ".geojson",
-          format: new mapboxgl.format.GeoJSON(),
+        this.map.addSource("source-id" + this.layerNumber, {
+          type: "geojson",
+          data: "quo.geojson",
         });
-        this.vectorLayer = new mapboxgl.layer.Vector({
-          source: vectorSource,
-          style: styleFunction,
+        this.map.addLayer({
+          id: "vectorLayer" + this.layerNumber + "point",
+          type: "circle",
+          source: "source-id" + this.layerNumber,
+          filters: ["in", "type", "Point"],
         });
-        this.map.addLayer(this.vectorLayer);
+        this.map.addLayer({
+          id: "vectorLayer" + this.layerNumber + "line",
+          type: "line",
+          source: "source-id" + this.layerNumber,
+          filters: ["in", "type", "MultiLineString"],
+        });
+        this.map.addLayer({
+          id: "vectorLayer" + this.layerNumber + "poly",
+          type: "fill",
+          source: "source-id" + this.layerNumber,
+
+          paint: {
+            "fill-color": "#ff0000",
+            "fill-opacity": 0.5,
+          },
+          filters: ["in", "type", "MultiPolygon"],
+        });
+        this.layerNumber++;
       }
 
-      this.loadingInterval = setInterval(() => {
-        if (this.map.tileQueue_.getTilesLoading() == 0) {
-          this.loading = false;
-        }
-      }, 1000);
+      // this.loadingInterval = setInterval(() => {
+      //   if (this.map.tileQueue_.getTilesLoading() == 0) {
+      //     this.loading = false;
+      //   }
+      // }, 1000);
     },
     formatTooltip(val) {
       if (this.rptResult.Date != undefined) {
