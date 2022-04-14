@@ -160,6 +160,6 @@ export default {
       /* height:60px;   */
       bottom:0px;
       left:0px;
-      position: absolute;
+      position: fixed;
   }
 </style>
