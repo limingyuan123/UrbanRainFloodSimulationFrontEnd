@@ -123,8 +123,10 @@ export default {
       timeSliderMap: true,
       layerNumber: 0,
       nodemin: 0,
+      nodemax: 0,
       nodestep: 1,
       linkmin: 0,
+      linkmax: 0,
       linkstep: 1,
       maxSlider: 10,
       marks: {},
@@ -339,6 +341,7 @@ export default {
       if (this.nodeRadio == 0) {
         // node
         this.nodemin = this.rptResult.MaxMin.node.minInflow;
+        this.nodemax = this.rptResult.MaxMin.node.maxInflow;
         var max = this.rptResult.MaxMin.node.maxInflow;
         this.nodestep = (max - this.nodemin) / 5;
       } else if (this.nodeRadio == 1) {
@@ -357,6 +360,7 @@ export default {
       if (this.linkRadio == 0) {
         // link
         this.linkmin = this.rptResult.MaxMin.link.minFlow;
+        this.linkmax = this.rptResult.MaxMin.link.maxFlow;
         var max = this.rptResult.MaxMin.link.maxFlow;
         this.linkstep = (max - this.linkmin) / 5;
       } else if (this.linkRadio == 1) {
@@ -417,140 +421,129 @@ export default {
         var feat = this.geojsonObject.features[this.rptResult.Node.length + k];
         feat.properties.value = this.linkResultArr[k][this.numberAnima];
       }
+      console.log(this.nodeResultArr);
       // 更新openlayer
       this.refreshOpenlayer();
     },
     refreshOpenlayer() {
       var that = this;
-      var styleFunction = function (feature) {
-        // 获取要素名称和值
-        var name = feature.get("name");
-        var value = feature.get("value");
-        var geometry = feature.getGeometry();
-        //获取要素类型，点线面
-        var type = feature.getGeometry().getType();
-        var styles = [];
-        var nodecolor = "";
-        var linkcolor = "";
+      // 计算色带步长
+      var nodecolors = ["#fdd519", "#f8a114", "#f36f0f", "#ee430b", "#e90806"];
+      var linkcolors = ["#51e1e6", "#40a9d9", "#3175ce", "#2549c4", "#140fb8"];
+      // var styleFunction = function (feature) {
+      //   // 获取要素名称和值
+      //   var name = feature.get("name");
+      //   var value = feature.get("value");
+      //   var geometry = feature.getGeometry();
+      //   //获取要素类型，点线面
+      //   var type = feature.getGeometry().getType();
+      //   var styles = [];
+      //   var nodecolor = "";
+      //   var linkcolor = "";
 
-        // 计算色带步长
-        var nodecolors = [
-          "#fdd519",
-          "#f8a114",
-          "#f36f0f",
-          "#ee430b",
-          "#e90806",
-        ];
-        var linkcolors = [
-          "#51e1e6",
-          "#40a9d9",
-          "#3175ce",
-          "#2549c4",
-          "#140fb8",
-        ];
-        if (type == "Point") {
-          if (that.nodestep == 0) {
-            nodecolor = nodecolors[0];
-          } else {
-            var index = Math.floor((value - that.nodemin) / that.nodestep);
-            if (index == 5) index = 4;
-            nodecolor = nodecolors[index];
-          }
-          styles.push(
-            new mapboxgl.style.Style({
-              image: new mapboxgl.style.Circle({
-                radius: 3,
-                fill: new mapboxgl.style.Fill({
-                  //填充样式
-                  color: nodecolor,
-                }),
-              }),
-            })
-          );
-        } else if (type == "LineString" || type == "MultiLineString") {
-          if (that.linkstep == 0) {
-            linkcolor = linkcolors[0];
-          } else {
-            var index = Math.floor((value - that.linkmin) / that.linkstep);
-            if (index == 5) index = 4;
-            linkcolor = linkcolors[index];
-          }
-          styles.push(
-            new mapboxgl.style.Style({
-              stroke: new mapboxgl.style.Stroke({
-                color: linkcolor,
-                width: 2,
-              }),
-            })
-          );
-          if (type == "LineString") {
-            // arrows
-            geometry.forEachSegment(function (start, end) {
-              var dx = end[0] - start[0];
-              var dy = end[1] - start[1];
-              var arrow = [start[0] + dx / 2, start[1] + dy / 2];
-              var rotation = Math.atan2(dy, dx);
-              // arrows
-              styles.push(
-                new mapboxgl.style.Style({
-                  geometry: new mapboxgl.geom.Point(arrow),
-                  image: new mapboxgl.style.Icon({
-                    src: "https://gitee.com/apollozs/typora-images/blob/master/imgs/arrow2.svg",
-                    //'https://gitee.com/apollozs/typora-images/raw/master/imgs/arrow2.svg',
-                    anchor: [0.5, 0.5],
-                    rotateWithView: true,
-                    rotation: -rotation,
-                  }),
-                })
-              );
-            });
-          } else {
-            var linestrings = geometry.getLineStrings();
-            for (let i = 0; i < linestrings.length; i++) {
-              var start = linestrings[i].flatCoordinates.slice(0, 2);
-              var end = linestrings[i].flatCoordinates.slice(-2);
-              var dx = end[0] - start[0];
-              var dy = end[1] - start[1];
-              var arrow = [start[0] + dx / 2, start[1] + dy / 2];
-              var rotation = Math.atan2(dy, dx);
-              // arrows
-              styles.push(
-                new mapboxgl.style.Style({
-                  geometry: new mapboxgl.geom.Point(arrow),
-                  image: new mapboxgl.style.Icon({
-                    src: "https://gitee.com/apollozs/typora-images/blob/master/imgs/arrow2.svg", //'https://gitee.com/apollozs/typora-images/raw/master/imgs/arrow2.svg',
-                    anchor: [0.5, 0.5],
-                    rotateWithView: true,
-                    rotation: -rotation,
-                  }),
-                })
-              );
-            }
-          }
-        } else {
-          styles.push(
-            new mapboxgl.style.Style({
-              stroke: new mapboxgl.style.Stroke({
-                color: "#ccc",
-                width: 1,
-              }),
-              fill: new mapboxgl.style.Fill({
-                color: "rgba(0, 0, 255, 0.1)",
-              }),
-              text: new mapboxgl.style.Text({
-                font: "10px Garamond",
-                text: name,
-              }),
-            })
-          );
-        }
+      //   if (type == "Point") {
+      //     if (that.nodestep == 0) {
+      //       nodecolor = nodecolors[0];
+      //     } else {
+      //       var index = Math.floor((value - that.nodemin) / that.nodestep);
+      //       if (index == 5) index = 4;
+      //       nodecolor = nodecolors[index];
+      //     }
+      //     styles.push(
+      //       new mapboxgl.style.Style({
+      //         image: new mapboxgl.style.Circle({
+      //           radius: 3,
+      //           fill: new mapboxgl.style.Fill({
+      //             //填充样式
+      //             color: nodecolor,
+      //           }),
+      //         }),
+      //       })
+      //     );
+      //   } else if (type == "LineString" || type == "MultiLineString") {
+      //     if (that.linkstep == 0) {
+      //       linkcolor = linkcolors[0];
+      //     } else {
+      //       var index = Math.floor((value - that.linkmin) / that.linkstep);
+      //       if (index == 5) index = 4;
+      //       linkcolor = linkcolors[index];
+      //     }
+      //     styles.push(
+      //       new mapboxgl.style.Style({
+      //         stroke: new mapboxgl.style.Stroke({
+      //           color: linkcolor,
+      //           width: 2,
+      //         }),
+      //       })
+      //     );
+      //     if (type == "LineString") {
+      //       // arrows
+      //       geometry.forEachSegment(function (start, end) {
+      //         var dx = end[0] - start[0];
+      //         var dy = end[1] - start[1];
+      //         var arrow = [start[0] + dx / 2, start[1] + dy / 2];
+      //         var rotation = Math.atan2(dy, dx);
+      //         // arrows
+      //         styles.push(
+      //           new mapboxgl.style.Style({
+      //             geometry: new mapboxgl.geom.Point(arrow),
+      //             image: new mapboxgl.style.Icon({
+      //               src: "https://gitee.com/apollozs/typora-images/blob/master/imgs/arrow2.svg",
+      //               //'https://gitee.com/apollozs/typora-images/raw/master/imgs/arrow2.svg',
+      //               anchor: [0.5, 0.5],
+      //               rotateWithView: true,
+      //               rotation: -rotation,
+      //             }),
+      //           })
+      //         );
+      //       });
+      //     } else {
+      //       var linestrings = geometry.getLineStrings();
+      //       for (let i = 0; i < linestrings.length; i++) {
+      //         var start = linestrings[i].flatCoordinates.slice(0, 2);
+      //         var end = linestrings[i].flatCoordinates.slice(-2);
+      //         var dx = end[0] - start[0];
+      //         var dy = end[1] - start[1];
+      //         var arrow = [start[0] + dx / 2, start[1] + dy / 2];
+      //         var rotation = Math.atan2(dy, dx);
+      //         // arrows
+      //         styles.push(
+      //           new mapboxgl.style.Style({
+      //             geometry: new mapboxgl.geom.Point(arrow),
+      //             image: new mapboxgl.style.Icon({
+      //               src: "https://gitee.com/apollozs/typora-images/blob/master/imgs/arrow2.svg", //'https://gitee.com/apollozs/typora-images/raw/master/imgs/arrow2.svg',
+      //               anchor: [0.5, 0.5],
+      //               rotateWithView: true,
+      //               rotation: -rotation,
+      //             }),
+      //           })
+      //         );
+      //       }
+      //     }
+      //   } else {
+      //     styles.push(
+      //       new mapboxgl.style.Style({
+      //         stroke: new mapboxgl.style.Stroke({
+      //           color: "#ccc",
+      //           width: 1,
+      //         }),
+      //         fill: new mapboxgl.style.Fill({
+      //           color: "rgba(0, 0, 255, 0.1)",
+      //         }),
+      //         text: new mapboxgl.style.Text({
+      //           font: "10px Garamond",
+      //           text: name,
+      //         }),
+      //       })
+      //     );
+      //   }
 
-        // 下面两句代码太耗时间 使用全局变量
-        // var nodemin = Math.min.apply(null, that.nodeResultArr.join(",").split(","))
-        // var nodestep = (Math.max.apply(null, that.nodeResultArr.join(",").split(",")) - nodemin)/5
+      //   // 下面两句代码太耗时间 使用全局变量
+      //   // var nodemin = Math.min.apply(null, that.nodeResultArr.join(",").split(","))
+      //   // var nodestep = (Math.max.apply(null, that.nodeResultArr.join(",").split(",")) - nodemin)/5
 
-        return styles;
-      };
+      //   return styles;
+      // };
 
       // 判断是否为第一次加载
       if (this.vectorLayer != null) {
@@ -575,6 +568,12 @@ export default {
           id: "vectorLayer" + this.layerNumber + "point",
           type: "circle",
           source: "source-id" + this.layerNumber,
+          // paint: {
+          //   "circle-color": 
+          //   [
+          //     "case",
+          //     ]
+          // },
           filters: ["in", "type", "Point"],
         });
         this.map.addLayer({
@@ -594,6 +593,49 @@ export default {
           },
           filters: ["in", "type", "MultiPolygon"],
         });
+        var that = this;
+        this.map.on(
+          "mouseenter",
+          "vectorLayer" + this.layerNumber + "point",
+          function () {
+            that.map.getCanvas().style.cursor = "pointer";
+          }
+        );
+        this.map.on(
+          "mouseleave",
+          "vectorLayer" + this.layerNumber + "point",
+          function () {
+            that.map.getCanvas().style.cursor = "";
+          }
+        );
+        this.map.on(
+          "mouseenter",
+          "vectorLayer" + this.layerNumber + "line",
+          function () {
+            that.map.getCanvas().style.cursor = "pointer";
+          }
+        );
+        this.map.on(
+          "mouseleave",
+          "vectorLayer" + this.layerNumber + "line",
+          function () {
+            that.map.getCanvas().style.cursor = "";
+          }
+        );
+        this.map.on(
+          "mouseenter",
+          "vectorLayer" + this.layerNumber + "poly",
+          function () {
+            that.map.getCanvas().style.cursor = "pointer";
+          }
+        );
+        this.map.on(
+          "mouseleave",
+          "vectorLayer" + this.layerNumber + "poly",
+          function () {
+            that.map.getCanvas().style.cursor = "";
+          }
+        );
         this.layerNumber++;
       }
 
