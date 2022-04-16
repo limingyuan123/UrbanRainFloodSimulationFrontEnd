@@ -171,7 +171,6 @@ export default {
         center: [120.845998, 31.037172],
         zoom: 15,
       });
-      console.log(this.map.on);
       //注册点击事件
       this.map.on("click", function (e) {
         console.log("点击");
@@ -186,7 +185,7 @@ export default {
     getrptResult() {
       return new Promise((resolve, reject) => {
         this.axios
-          .get("quo_5.disp")
+          .get("/quo_5.disp")
           .then((res) => {
             resolve(res.data);
           })
@@ -198,7 +197,7 @@ export default {
     getGeojson() {
       return new Promise((resolve, reject) => {
         this.axios
-          .get("quo.geojson")
+          .get("/quo2.geojson")
           .then((res) => {
             resolve(res.data);
           })
@@ -213,6 +212,10 @@ export default {
       Promise.all([f, ff]).then((array) => {
         this.rptResult = array[0];
         this.geojsonObject = array[1];
+        console.log(this.geojsonObject.features[1].properties['value']);
+        console.log(this.geojsonObject.features[1].properties.name);
+        console.log(this.geojsonObject.features
+        );
         this.options = [
           {
             value: "node",
@@ -288,6 +291,96 @@ export default {
           };
           this.options[1].children.push(child);
         }
+        this.map.addSource("source-id" + this.layerNumber, {
+          type: "geojson",
+          data: this.geojsonObject,
+        });
+        let ll = 1;
+        this.map.addLayer({
+          id: "vectorLayer" + this.layerNumber + "poly",
+          type: "fill",
+          source: "source-id" + this.layerNumber,
+
+          paint: {
+            "fill-color": "#000000",
+            "fill-opacity": 0.1,
+          },
+          filters: ["in", "type", "MultiPolygon"],
+        });
+        this.map.addLayer({
+          id: "vectorLayer" + this.layerNumber + "line",
+          type: "line",
+          source: "source-id" + this.layerNumber,
+          filters: ["in", "type", "MultiLineString"],
+        });
+        this.map.addLayer({
+          id: "vectorLayer" + this.layerNumber + "point",
+          type: "circle",
+          source: "source-id" + this.layerNumber,
+          paint: {
+            "circle-color": [
+              "case",
+              ["<", ["get", "value"], this.nodemin],
+              "#ffffff", //<10.8
+              ["<", ["get", "value"], this.nodemin + ll * this.nodestep],
+              "#fdd519", //>=10.8 & <17.2
+              ["<", ["get", "value"], this.nodemin + (ll + 1) * this.nodestep],
+              "#f8a114",
+              ["<", ["get", "value"], this.nodemin + (ll + 2) * this.nodestep],
+              "#f36f0f",
+              ["<=", ["get", "value"], this.nodemin + (ll + 3) * this.nodestep],
+              "#ee430b",
+              ["<=", ["get", "value"], this.nodemin + (ll + 4) * this.nodestep],
+              "#e90806", //>=41.5 & <50.1
+              "#e90806", // 默认值, >=50.1
+            ],
+          },
+          filters: ["in", "type", "Point"],
+        });
+        var that = this;
+        this.map.on(
+          "mouseenter",
+          "vectorLayer" + this.layerNumber + "point",
+          function () {
+            that.map.getCanvas().style.cursor = "pointer";
+          }
+        );
+        this.map.on(
+          "mouseleave",
+          "vectorLayer" + this.layerNumber + "point",
+          function () {
+            that.map.getCanvas().style.cursor = "";
+          }
+        );
+        this.map.on(
+          "mouseenter",
+          "vectorLayer" + this.layerNumber + "line",
+          function () {
+            that.map.getCanvas().style.cursor = "pointer";
+          }
+        );
+        this.map.on(
+          "mouseleave",
+          "vectorLayer" + this.layerNumber + "line",
+          function () {
+            that.map.getCanvas().style.cursor = "";
+          }
+        );
+        // this.map.on(
+        //   "mouseenter",
+        //   "vectorLayer" + this.layerNumber + "poly",
+        //   function () {
+        //     that.map.getCanvas().style.cursor = "pointer";
+        //   }
+        // );
+        // this.map.on(
+        //   "mouseleave",
+        //   "vectorLayer" + this.layerNumber + "poly",
+        //   (e) => {
+        //     that.map.getCanvas().style.cursor = "";
+        //   }
+        // );
+        this.layerNumber++;
         this.changeChooseMap();
         // slider
         this.timeSliderMap = false;
@@ -342,57 +435,43 @@ export default {
         // node
         this.nodemin = this.rptResult.MaxMin.node.minInflow;
         this.nodemax = this.rptResult.MaxMin.node.maxInflow;
-        var max = this.rptResult.MaxMin.node.maxInflow;
-        this.nodestep = (max - this.nodemin) / 5;
+
+        let max = this.rptResult.MaxMin.node.maxInflow;
+        this.nodestep = (this.nodemax - this.nodemin) / 5;
       } else if (this.nodeRadio == 1) {
         this.nodemin = this.rptResult.MaxMin.node.minFlooding;
-        var max = this.rptResult.MaxMin.node.maxFlooding;
-        this.nodestep = (max - this.nodemin) / 5;
+        this.nodemax = this.rptResult.MaxMin.node.maxFlooding;
+        this.nodestep = (this.nodemax - this.nodemin) / 5;
       } else if (this.nodeRadio == 2) {
         this.nodemin = this.rptResult.MaxMin.node.minDepth;
-        var max = this.rptResult.MaxMin.node.maxDepth;
-        this.nodestep = (max - this.nodemin) / 5;
+        this.nodemax = this.rptResult.MaxMin.node.maxDepth;
+        this.nodestep = (this.nodemax - this.nodemin) / 5;
       } else if (this.nodeRadio == 3) {
         this.nodemin = this.rptResult.MaxMin.node.minHead;
-        var max = this.rptResult.MaxMin.node.maxHead;
-        this.nodestep = (max - this.nodemin) / 5;
+        this.nodemax = this.rptResult.MaxMin.node.maxHead;
+        this.nodestep = (this.nodemax - this.nodemin) / 5;
       }
       if (this.linkRadio == 0) {
         // link
         this.linkmin = this.rptResult.MaxMin.link.minFlow;
         this.linkmax = this.rptResult.MaxMin.link.maxFlow;
-        var max = this.rptResult.MaxMin.link.maxFlow;
-        this.linkstep = (max - this.linkmin) / 5;
+        this.linkstep = (this.linkmax - this.linkmin) / 5;
       } else if (this.linkRadio == 1) {
         this.linkmin = this.rptResult.MaxMin.link.minVelocity;
-        var max = this.rptResult.MaxMin.link.maxVelocity;
-        this.linkstep = (max - this.linkmin) / 5;
+        this.linkmax = this.rptResult.MaxMin.link.maxVelocity;
+        this.linkstep = (this.linkmax - this.linkmin) / 5;
       } else if (this.linkRadio == 2) {
         this.linkmin = this.rptResult.MaxMin.link.minDepth;
-        var max = this.rptResult.MaxMin.link.maxDepth;
-        this.linkstep = (max - this.linkmin) / 5;
+        this.linkmax = this.rptResult.MaxMin.link.maxDepth;
+        this.linkstep = (this.linkmax - this.linkmin) / 5;
       } else if (this.linkRadio == 3) {
         this.linkmin = this.rptResult.MaxMin.link.minCapacity;
-        var max = this.rptResult.MaxMin.link.maxCapacity;
-        this.linkstep = (max - this.linkmin) / 5;
+        this.linkmax = this.rptResult.MaxMin.link.maxCapacity;
+        this.linkstep = (this.linkmax - this.linkmin) / 5;
       }
-      // this.map.setView(
-      //   new mapboxgl.View({
-      //     projection: "EPSG:4326",
-      //     // center: this.geojsonObject.features[0].geometry.coordinates,
-      //     center: [120.845, 31.037],
-      //     zoom: 14,
-      //   })
-      // )
       this.map.setZoom(14);
       this.map.setCenter({ lng: 120.845, lat: 31.037 });
-
-      // 更新openlayer
-      // this.refreshOpenlayer()
-
-      // setTimeout(()=>{
       this.sliderChange(33);
-      // },0)
     },
     handleClick() {},
     confirmLoad() {},
@@ -413,237 +492,43 @@ export default {
       this.numberAnima = val - 1;
       for (let i = 0; i < this.rptResult.Node.length; i++) {
         // 更新geojsonObject
-        var feat = this.geojsonObject.features[i];
+        let feat = this.geojsonObject.features[i];
         feat.properties.value = this.nodeResultArr[i][this.numberAnima];
       }
       for (let k = 0; k < this.rptResult.Link.length; k++) {
         // 更新geojsonObject
-        var feat = this.geojsonObject.features[this.rptResult.Node.length + k];
+        let feat = this.geojsonObject.features[this.rptResult.Node.length + k];
         feat.properties.value = this.linkResultArr[k][this.numberAnima];
       }
-      console.log(this.nodeResultArr);
       // 更新openlayer
-      this.refreshOpenlayer();
+      // this.refreshOpenlayer();
     },
     refreshOpenlayer() {
-      var that = this;
-      // 计算色带步长
-      var nodecolors = ["#fdd519", "#f8a114", "#f36f0f", "#ee430b", "#e90806"];
-      var linkcolors = ["#51e1e6", "#40a9d9", "#3175ce", "#2549c4", "#140fb8"];
-      // var styleFunction = function (feature) {
-      //   // 获取要素名称和值
-      //   var name = feature.get("name");
-      //   var value = feature.get("value");
-      //   var geometry = feature.getGeometry();
-      //   //获取要素类型，点线面
-      //   var type = feature.getGeometry().getType();
-      //   var styles = [];
-      //   var nodecolor = "";
-      //   var linkcolor = "";
-
-      //   if (type == "Point") {
-      //     if (that.nodestep == 0) {
-      //       nodecolor = nodecolors[0];
-      //     } else {
-      //       var index = Math.floor((value - that.nodemin) / that.nodestep);
-      //       if (index == 5) index = 4;
-      //       nodecolor = nodecolors[index];
-      //     }
-      //     styles.push(
-      //       new mapboxgl.style.Style({
-      //         image: new mapboxgl.style.Circle({
-      //           radius: 3,
-      //           fill: new mapboxgl.style.Fill({
-      //             //填充样式
-      //             color: nodecolor,
-      //           }),
-      //         }),
-      //       })
-      //     );
-      //   } else if (type == "LineString" || type == "MultiLineString") {
-      //     if (that.linkstep == 0) {
-      //       linkcolor = linkcolors[0];
-      //     } else {
-      //       var index = Math.floor((value - that.linkmin) / that.linkstep);
-      //       if (index == 5) index = 4;
-      //       linkcolor = linkcolors[index];
-      //     }
-      //     styles.push(
-      //       new mapboxgl.style.Style({
-      //         stroke: new mapboxgl.style.Stroke({
-      //           color: linkcolor,
-      //           width: 2,
-      //         }),
-      //       })
-      //     );
-      //     if (type == "LineString") {
-      //       // arrows
-      //       geometry.forEachSegment(function (start, end) {
-      //         var dx = end[0] - start[0];
-      //         var dy = end[1] - start[1];
-      //         var arrow = [start[0] + dx / 2, start[1] + dy / 2];
-      //         var rotation = Math.atan2(dy, dx);
-      //         // arrows
-      //         styles.push(
-      //           new mapboxgl.style.Style({
-      //             geometry: new mapboxgl.geom.Point(arrow),
-      //             image: new mapboxgl.style.Icon({
-      //               src: "https://gitee.com/apollozs/typora-images/blob/master/imgs/arrow2.svg",
-      //               //'https://gitee.com/apollozs/typora-images/raw/master/imgs/arrow2.svg',
-      //               anchor: [0.5, 0.5],
-      //               rotateWithView: true,
-      //               rotation: -rotation,
-      //             }),
-      //           })
-      //         );
-      //       });
-      //     } else {
-      //       var linestrings = geometry.getLineStrings();
-      //       for (let i = 0; i < linestrings.length; i++) {
-      //         var start = linestrings[i].flatCoordinates.slice(0, 2);
-      //         var end = linestrings[i].flatCoordinates.slice(-2);
-      //         var dx = end[0] - start[0];
-      //         var dy = end[1] - start[1];
-      //         var arrow = [start[0] + dx / 2, start[1] + dy / 2];
-      //         var rotation = Math.atan2(dy, dx);
-      //         // arrows
-      //         styles.push(
-      //           new mapboxgl.style.Style({
-      //             geometry: new mapboxgl.geom.Point(arrow),
-      //             image: new mapboxgl.style.Icon({
-      //               src: "https://gitee.com/apollozs/typora-images/blob/master/imgs/arrow2.svg", //'https://gitee.com/apollozs/typora-images/raw/master/imgs/arrow2.svg',
-      //               anchor: [0.5, 0.5],
-      //               rotateWithView: true,
-      //               rotation: -rotation,
-      //             }),
-      //           })
-      //         );
-      //       }
-      //     }
-      //   } else {
-      //     styles.push(
-      //       new mapboxgl.style.Style({
-      //         stroke: new mapboxgl.style.Stroke({
-      //           color: "#ccc",
-      //           width: 1,
-      //         }),
-      //         fill: new mapboxgl.style.Fill({
-      //           color: "rgba(0, 0, 255, 0.1)",
-      //         }),
-      //         text: new mapboxgl.style.Text({
-      //           font: "10px Garamond",
-      //           text: name,
-      //         }),
-      //       })
-      //     );
-      //   }
-
-      //   // 下面两句代码太耗时间 使用全局变量
-      //   // var nodemin = Math.min.apply(null, that.nodeResultArr.join(",").split(","))
-      //   // var nodestep = (Math.max.apply(null, that.nodeResultArr.join(",").split(",")) - nodemin)/5
-
-      //   return styles;
-      // };
-
-      // 判断是否为第一次加载
-      if (this.vectorLayer != null) {
-        // this.map.removeLayer(this.vectorLayer)
-        // 动态更新则可以已通过变量进行，否则从文件里读取也不现实
-        this.vectorLayer.setSource(
-          new mapboxgl.source.Vector({
-            // projection: 'EPSG:4326', // 可以省略
-            features: new mapboxgl.format.GeoJSON().readFeatures(
-              this.geojsonObject
-            ),
-          })
-        );
-        this.vectorLayer.setStyle(styleFunction);
-      } else {
-        // 第一次不能从变量里加载，会出现错位问题，原因未知
-        this.map.addSource("source-id" + this.layerNumber, {
-          type: "geojson",
-          data: "quo.geojson",
-        });
-        this.map.addLayer({
-          id: "vectorLayer" + this.layerNumber + "point",
-          type: "circle",
-          source: "source-id" + this.layerNumber,
-          // paint: {
-          //   "circle-color": 
-          //   [
-          //     "case",
-          //     ]
-          // },
-          filters: ["in", "type", "Point"],
-        });
-        this.map.addLayer({
-          id: "vectorLayer" + this.layerNumber + "line",
-          type: "line",
-          source: "source-id" + this.layerNumber,
-          filters: ["in", "type", "MultiLineString"],
-        });
-        this.map.addLayer({
-          id: "vectorLayer" + this.layerNumber + "poly",
-          type: "fill",
-          source: "source-id" + this.layerNumber,
-
-          paint: {
-            "fill-color": "#ff0000",
-            "fill-opacity": 0.5,
-          },
-          filters: ["in", "type", "MultiPolygon"],
-        });
-        var that = this;
-        this.map.on(
-          "mouseenter",
-          "vectorLayer" + this.layerNumber + "point",
-          function () {
-            that.map.getCanvas().style.cursor = "pointer";
-          }
-        );
-        this.map.on(
-          "mouseleave",
-          "vectorLayer" + this.layerNumber + "point",
-          function () {
-            that.map.getCanvas().style.cursor = "";
-          }
-        );
-        this.map.on(
-          "mouseenter",
-          "vectorLayer" + this.layerNumber + "line",
-          function () {
-            that.map.getCanvas().style.cursor = "pointer";
-          }
-        );
-        this.map.on(
-          "mouseleave",
-          "vectorLayer" + this.layerNumber + "line",
-          function () {
-            that.map.getCanvas().style.cursor = "";
-          }
-        );
-        this.map.on(
-          "mouseenter",
-          "vectorLayer" + this.layerNumber + "poly",
-          function () {
-            that.map.getCanvas().style.cursor = "pointer";
-          }
-        );
-        this.map.on(
-          "mouseleave",
-          "vectorLayer" + this.layerNumber + "poly",
-          function () {
-            that.map.getCanvas().style.cursor = "";
-          }
-        );
-        this.layerNumber++;
+      var feature = this.map.queryRenderedFeatures({
+        layers: ["vectorLayer" + 0 + "point"],
+      });
+      for (let i = 0; i < this.rptResult.Node.length; i++) {
+        // 更新geojsonObject
+        let feat = this.geojsonObject.features[i];
+        feature[i].properties.value = this.nodeResultArr[i][this.numberAnima];
       }
-
-      // this.loadingInterval = setInterval(() => {
-      //   if (this.map.tileQueue_.getTilesLoading() == 0) {
-      //     this.loading = false;
-      //   }
-      // }, 1000);
+      let ll = 1;
+      this.map.setPaintProperty("vectorLayer" + 0 + "point", "circle-color", [
+        "case",
+        ["<", ["get", "value"], this.nodemin],
+        "#fdd519", //<10.8
+        ["<", ["get", "value"], this.nodemin + ll * this.nodestep],
+        "#fdd519", //>=10.8 & <17.2
+        ["<", ["get", "value"], this.nodemin + (ll + 1) * this.nodestep],
+        "#f8a114",
+        ["<", ["get", "value"], this.nodemin + (ll + 2) * this.nodestep],
+        "#f36f0f",
+        ["<=", ["get", "value"], this.nodemin + (ll + 3) * this.nodestep],
+        "#ee430b",
+        ["<=", ["get", "value"], this.nodemin + (ll + 4) * this.nodestep],
+        "#e90806", //>=41.5 & <50.1
+        "#e90806", // 默认值, >=50.1
+      ]);
     },
     formatTooltip(val) {
       if (this.rptResult.Date != undefined) {
@@ -686,14 +571,20 @@ export default {
         }
         for (let i = 0; i < this.rptResult.Node.length; i++) {
           // 更新geojsonObject
-          var feat = this.geojsonObject.features[i];
-          feat.properties.value = this.nodeResultArr[i][this.numberAnima];
+          let feat = this.geojsonObject.features[i];
+          this.geojsonObject.features[i].properties.value =
+            this.nodeResultArr[i][this.numberAnima];
+          // if(feat.properties.value!=0){
+          //   console.log(i)
+          // }
         }
         for (let k = 0; k < this.rptResult.Link.length; k++) {
           // 更新geojsonObject
-          var feat =
+          let feat =
             this.geojsonObject.features[this.rptResult.Node.length + k];
-          feat.properties.value = this.linkResultArr[k][this.numberAnima];
+          this.geojsonObject.features[
+            this.rptResult.Node.length + k
+          ].properties.value = this.linkResultArr[k][this.numberAnima];
         }
         // 更新openlayer
         this.refreshOpenlayer();
