@@ -172,9 +172,9 @@ export default {
         zoom: 15,
       });
       //注册点击事件
-      this.map.on("click", function (e) {
-        console.log("点击");
-      });
+      // this.map.on("click", function (e) {
+      //   console.log("点击");
+      // });
     },
     handleOpen(key, keyPath) {
       console.log(key, keyPath);
@@ -213,9 +213,6 @@ export default {
       Promise.all([f, ff]).then((array) => {
         _this.rptResult = array[0];
         _this.geojsonObject = array[1];
-        console.log(_this.geojsonObject.features[1].properties["value"]);
-        console.log(_this.geojsonObject.features[1].properties.name);
-        console.log(_this.geojsonObject.features);
         _this.options = [
           {
             value: "node",
@@ -313,7 +310,7 @@ export default {
           type: "line",
           source: "source-id" + _this.layerNumber,
           paint: {
-            'line-width':3,
+            "line-width": 3,
             "line-color": [
               "case",
               ["<", ["get", "value"], _this.linkmin],
@@ -344,7 +341,7 @@ export default {
                 _this.linkmin + (ll + 4) * _this.linkstep,
               ],
               "#140fb8", //>=41.5 & <50.1
-              "#140fb8" // 默认值, >=50.1
+              "#140fb8", // 默认值, >=50.1
             ],
           },
           filters: ["in", "type", "MultiLineString"],
@@ -416,6 +413,24 @@ export default {
           "vectorLayer" + _this.layerNumber + "line",
           function () {
             _this.map.getCanvas().style.cursor = "";
+          }
+        );
+        _this.map.on(
+          "click",
+          "vectorLayer" + _this.layerNumber + "point",
+          (e) => {
+            // Copy coordinates array.
+            const coordinates = e.features[0].geometry.coordinates.slice();
+            // Ensure that if the map is zoomed out such that multiple
+            // copies of the feature are visible, the popup appears
+            // over the copy being pointed to.
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+              coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+            new mapboxgl.Popup()
+              .setLngLat(e.lngLat)
+              .setHTML("<p>图</p>")
+              .addTo(_this.map);
           }
         );
         _this.layerNumber++;
