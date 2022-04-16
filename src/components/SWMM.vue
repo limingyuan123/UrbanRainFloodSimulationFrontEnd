@@ -182,9 +182,9 @@ export default {
     handleClose(key, keyPath) {
       console.log(key, keyPath);
     },
-    getrptResult() {
+    getrptResult(e) {
       return new Promise((resolve, reject) => {
-        this.axios
+        e.axios
           .get("/quo_5.disp")
           .then((res) => {
             resolve(res.data);
@@ -194,9 +194,9 @@ export default {
           });
       });
     },
-    getGeojson() {
+    getGeojson(e) {
       return new Promise((resolve, reject) => {
-        this.axios
+        e.axios
           .get("/quo2.geojson")
           .then((res) => {
             resolve(res.data);
@@ -207,16 +207,16 @@ export default {
       });
     },
     openFileDialog() {
-      let f = this.getrptResult();
-      let ff = this.getGeojson();
+      let f = this.getrptResult(this);
+      let ff = this.getGeojson(this);
+      let _this = this;
       Promise.all([f, ff]).then((array) => {
-        this.rptResult = array[0];
-        this.geojsonObject = array[1];
-        console.log(this.geojsonObject.features[1].properties['value']);
-        console.log(this.geojsonObject.features[1].properties.name);
-        console.log(this.geojsonObject.features
-        );
-        this.options = [
+        _this.rptResult = array[0];
+        _this.geojsonObject = array[1];
+        console.log(_this.geojsonObject.features[1].properties["value"]);
+        console.log(_this.geojsonObject.features[1].properties.name);
+        console.log(_this.geojsonObject.features);
+        _this.options = [
           {
             value: "node",
             label: "Node Results",
@@ -229,10 +229,10 @@ export default {
           },
         ];
         // chart Tab
-        for (let i = 0; i < this.rptResult.Node.length; i++) {
-          var node = this.rptResult.Node[i];
-          var nodeResult = this.rptResult.NodeResults[i];
-          var child = {
+        for (let i = 0; i < _this.rptResult.Node.length; i++) {
+          let node = _this.rptResult.Node[i];
+          let nodeResult = _this.rptResult.NodeResults[i];
+          let child = {
             value: node.toLowerCase(),
             label: node,
             children: [
@@ -258,12 +258,12 @@ export default {
               },
             ],
           };
-          this.options[0].children.push(child);
+          _this.options[0].children.push(child);
         }
-        for (let j = 0; j < this.rptResult.Link.length; j++) {
-          var link = this.rptResult.Link[j];
-          var linkResult = this.rptResult.LinkResults[j];
-          var child = {
+        for (let j = 0; j < _this.rptResult.Link.length; j++) {
+          let link = _this.rptResult.Link[j];
+          let linkResult = _this.rptResult.LinkResults[j];
+          let child = {
             value: link.toLowerCase(),
             label: link,
             children: [
@@ -289,189 +289,227 @@ export default {
               },
             ],
           };
-          this.options[1].children.push(child);
+          _this.options[1].children.push(child);
         }
-        this.map.addSource("source-id" + this.layerNumber, {
+        _this.changeChooseMap(_this);
+        _this.map.addSource("source-id" + _this.layerNumber, {
           type: "geojson",
-          data: this.geojsonObject,
+          data: _this.geojsonObject,
         });
         let ll = 1;
-        this.map.addLayer({
-          id: "vectorLayer" + this.layerNumber + "poly",
-          type: "fill",
-          source: "source-id" + this.layerNumber,
+        // _this.map.addLayer({
+        //   id: "vectorLayer" + _this.layerNumber + "poly",
+        //   type: "fill",
+        //   source: "source-id" + _this.layerNumber,
 
-          paint: {
-            "fill-color": "#000000",
-            "fill-opacity": 0.1,
-          },
-          filters: ["in", "type", "MultiPolygon"],
-        });
-        this.map.addLayer({
-          id: "vectorLayer" + this.layerNumber + "line",
+        //   paint: {
+        //     "fill-color": "#000000",
+        //     "fill-opacity": 0.1,
+        //   },
+        //   filters: ["in", "type", "MultiPolygon"],
+        // });
+        _this.map.addLayer({
+          id: "vectorLayer" + _this.layerNumber + "line",
           type: "line",
-          source: "source-id" + this.layerNumber,
+          source: "source-id" + _this.layerNumber,
+          paint: {
+            'line-width':3,
+            "line-color": [
+              "case",
+              ["<", ["get", "value"], _this.linkmin],
+              "#ffffff", //<10.8
+              ["<", ["get", "value"], _this.linkmin + ll * _this.linkstep],
+              "#51e1e6", //>=10.8 & <17.2
+              [
+                "<",
+                ["get", "value"],
+                _this.linkmin + (ll + 1) * _this.linkstep,
+              ],
+              "#40a9d9",
+              [
+                "<",
+                ["get", "value"],
+                _this.linkmin + (ll + 2) * _this.linkstep,
+              ],
+              "#3175ce",
+              [
+                "<=",
+                ["get", "value"],
+                _this.linkmin + (ll + 3) * _this.linkstep,
+              ],
+              "#2549c4",
+              [
+                "<=",
+                ["get", "value"],
+                _this.linkmin + (ll + 4) * _this.linkstep,
+              ],
+              "#140fb8", //>=41.5 & <50.1
+              "#140fb8" // 默认值, >=50.1
+            ],
+          },
           filters: ["in", "type", "MultiLineString"],
         });
-        this.map.addLayer({
-          id: "vectorLayer" + this.layerNumber + "point",
+
+        _this.map.addLayer({
+          id: "vectorLayer" + _this.layerNumber + "point",
           type: "circle",
-          source: "source-id" + this.layerNumber,
+          source: "source-id" + _this.layerNumber,
           paint: {
             "circle-color": [
               "case",
-              ["<", ["get", "value"], this.nodemin],
+              ["<", ["get", "value"], _this.nodemin],
               "#ffffff", //<10.8
-              ["<", ["get", "value"], this.nodemin + ll * this.nodestep],
+              ["<", ["get", "value"], _this.nodemin + ll * _this.nodestep],
               "#fdd519", //>=10.8 & <17.2
-              ["<", ["get", "value"], this.nodemin + (ll + 1) * this.nodestep],
+              [
+                "<",
+                ["get", "value"],
+                _this.nodemin + (ll + 1) * _this.nodestep,
+              ],
               "#f8a114",
-              ["<", ["get", "value"], this.nodemin + (ll + 2) * this.nodestep],
+              [
+                "<",
+                ["get", "value"],
+                _this.nodemin + (ll + 2) * _this.nodestep,
+              ],
               "#f36f0f",
-              ["<=", ["get", "value"], this.nodemin + (ll + 3) * this.nodestep],
+              [
+                "<=",
+                ["get", "value"],
+                _this.nodemin + (ll + 3) * _this.nodestep,
+              ],
               "#ee430b",
-              ["<=", ["get", "value"], this.nodemin + (ll + 4) * this.nodestep],
+              [
+                "<=",
+                ["get", "value"],
+                _this.nodemin + (ll + 4) * _this.nodestep,
+              ],
               "#e90806", //>=41.5 & <50.1
               "#e90806", // 默认值, >=50.1
             ],
           },
           filters: ["in", "type", "Point"],
         });
-        var that = this;
-        this.map.on(
+        _this.map.on(
           "mouseenter",
-          "vectorLayer" + this.layerNumber + "point",
+          "vectorLayer" + _this.layerNumber + "point",
           function () {
-            that.map.getCanvas().style.cursor = "pointer";
+            _this.map.getCanvas().style.cursor = "pointer";
           }
         );
-        this.map.on(
+        _this.map.on(
           "mouseleave",
-          "vectorLayer" + this.layerNumber + "point",
+          "vectorLayer" + _this.layerNumber + "point",
           function () {
-            that.map.getCanvas().style.cursor = "";
+            _this.map.getCanvas().style.cursor = "";
           }
         );
-        this.map.on(
+        _this.map.on(
           "mouseenter",
-          "vectorLayer" + this.layerNumber + "line",
+          "vectorLayer" + _this.layerNumber + "line",
           function () {
-            that.map.getCanvas().style.cursor = "pointer";
+            _this.map.getCanvas().style.cursor = "pointer";
           }
         );
-        this.map.on(
+        _this.map.on(
           "mouseleave",
-          "vectorLayer" + this.layerNumber + "line",
+          "vectorLayer" + _this.layerNumber + "line",
           function () {
-            that.map.getCanvas().style.cursor = "";
+            _this.map.getCanvas().style.cursor = "";
           }
         );
-        // this.map.on(
-        //   "mouseenter",
-        //   "vectorLayer" + this.layerNumber + "poly",
-        //   function () {
-        //     that.map.getCanvas().style.cursor = "pointer";
-        //   }
-        // );
-        // this.map.on(
-        //   "mouseleave",
-        //   "vectorLayer" + this.layerNumber + "poly",
-        //   (e) => {
-        //     that.map.getCanvas().style.cursor = "";
-        //   }
-        // );
-        this.layerNumber++;
-        this.changeChooseMap();
+        _this.layerNumber++;
+
         // slider
-        this.timeSliderMap = false;
-        this.maxSlider = this.rptResult.Date.length;
-        this.marks = {
-          1: this.formatTooltip(1),
+        _this.timeSliderMap = false;
+        _this.maxSlider = _this.rptResult.Date.length;
+        _this.marks = {
+          1: _this.formatTooltip(1),
         };
 
         // btn
-        this.startBtn = false;
-        this.conduitStartBtn = false;
+        _this.startBtn = false;
+        _this.conduitStartBtn = false;
       });
 
       // map Tab
 
       //conduit
     },
-    changeChooseMap() {
+    changeChooseMap(e) {
       // 还原slider
-      this.numberAnima = 32;
-      this.timeSlider = 33;
+      e.numberAnima = 32;
+      e.timeSlider = 33;
 
-      this.loading = true;
-      this.propertySelectVisible = false;
+      e.loading = true;
+      e.propertySelectVisible = false;
       // 获取所有要素的选中属性
-      this.nodeResultArr = [];
-      this.linkResultArr = [];
-      for (let i = 0; i < this.options[0].children.length; i++) {
+      e.nodeResultArr = [];
+      e.linkResultArr = [];
+      for (let i = 0; i < e.options[0].children.length; i++) {
         // node
-        var node = this.options[0].children[i];
-        var element = node.children[this.nodeRadio];
-        this.nodeResultArr.push(element.data); // 汇总该属性的所有模拟值
+        var node = e.options[0].children[i];
+        var element = node.children[e.nodeRadio];
+        e.nodeResultArr.push(element.data); // 汇总该属性的所有模拟值
       }
-      for (let k = 0; k < this.rptResult.Node.length; k++) {
+      for (let k = 0; k < e.rptResult.Node.length; k++) {
         // 更新geojsonObject
-        var feat = this.geojsonObject.features[k];
-        feat.properties.value = this.nodeResultArr[k][0];
+        var feat = e.geojsonObject.features[k];
+        feat.properties.value = e.nodeResultArr[k][0];
       }
-      for (let i = 0; i < this.options[1].children.length; i++) {
+      for (let i = 0; i < e.options[1].children.length; i++) {
         // link
-        var link = this.options[1].children[i];
-        var element = link.children[this.linkRadio];
-        this.linkResultArr.push(element.data);
+        var link = e.options[1].children[i];
+        var element = link.children[e.linkRadio];
+        e.linkResultArr.push(element.data);
       }
-      for (let k = 0; k < this.rptResult.Link.length; k++) {
+      for (let k = 0; k < e.rptResult.Link.length; k++) {
         // 更新geojsonObject
-        var feat = this.geojsonObject.features[this.rptResult.Node.length + k];
-        feat.properties.value = this.linkResultArr[k][0];
+        var feat = e.geojsonObject.features[e.rptResult.Node.length + k];
+        feat.properties.value = e.linkResultArr[k][0];
       }
       // 获取最大最小值
-      if (this.nodeRadio == 0) {
+      if (e.nodeRadio == 0) {
         // node
-        this.nodemin = this.rptResult.MaxMin.node.minInflow;
-        this.nodemax = this.rptResult.MaxMin.node.maxInflow;
+        e.nodemin = e.rptResult.MaxMin.node.minInflow;
+        e.nodemax = e.rptResult.MaxMin.node.maxInflow;
 
-        let max = this.rptResult.MaxMin.node.maxInflow;
-        this.nodestep = (this.nodemax - this.nodemin) / 5;
-      } else if (this.nodeRadio == 1) {
-        this.nodemin = this.rptResult.MaxMin.node.minFlooding;
-        this.nodemax = this.rptResult.MaxMin.node.maxFlooding;
-        this.nodestep = (this.nodemax - this.nodemin) / 5;
-      } else if (this.nodeRadio == 2) {
-        this.nodemin = this.rptResult.MaxMin.node.minDepth;
-        this.nodemax = this.rptResult.MaxMin.node.maxDepth;
-        this.nodestep = (this.nodemax - this.nodemin) / 5;
-      } else if (this.nodeRadio == 3) {
-        this.nodemin = this.rptResult.MaxMin.node.minHead;
-        this.nodemax = this.rptResult.MaxMin.node.maxHead;
-        this.nodestep = (this.nodemax - this.nodemin) / 5;
+        let max = e.rptResult.MaxMin.node.maxInflow;
+        e.nodestep = (e.nodemax - e.nodemin) / 5;
+      } else if (e.nodeRadio == 1) {
+        e.nodemin = e.rptResult.MaxMin.node.minFlooding;
+        e.nodemax = e.rptResult.MaxMin.node.maxFlooding;
+        e.nodestep = (e.nodemax - e.nodemin) / 5;
+      } else if (e.nodeRadio == 2) {
+        e.nodemin = e.rptResult.MaxMin.node.minDepth;
+        e.nodemax = e.rptResult.MaxMin.node.maxDepth;
+        e.nodestep = (e.nodemax - e.nodemin) / 5;
+      } else if (e.nodeRadio == 3) {
+        e.nodemin = e.rptResult.MaxMin.node.minHead;
+        e.nodemax = e.rptResult.MaxMin.node.maxHead;
+        e.nodestep = (e.nodemax - e.nodemin) / 5;
       }
-      if (this.linkRadio == 0) {
+      if (e.linkRadio == 0) {
         // link
-        this.linkmin = this.rptResult.MaxMin.link.minFlow;
-        this.linkmax = this.rptResult.MaxMin.link.maxFlow;
-        this.linkstep = (this.linkmax - this.linkmin) / 5;
-      } else if (this.linkRadio == 1) {
-        this.linkmin = this.rptResult.MaxMin.link.minVelocity;
-        this.linkmax = this.rptResult.MaxMin.link.maxVelocity;
-        this.linkstep = (this.linkmax - this.linkmin) / 5;
-      } else if (this.linkRadio == 2) {
-        this.linkmin = this.rptResult.MaxMin.link.minDepth;
-        this.linkmax = this.rptResult.MaxMin.link.maxDepth;
-        this.linkstep = (this.linkmax - this.linkmin) / 5;
-      } else if (this.linkRadio == 3) {
-        this.linkmin = this.rptResult.MaxMin.link.minCapacity;
-        this.linkmax = this.rptResult.MaxMin.link.maxCapacity;
-        this.linkstep = (this.linkmax - this.linkmin) / 5;
+        e.linkmin = e.rptResult.MaxMin.link.minFlow;
+        e.linkmax = e.rptResult.MaxMin.link.maxFlow;
+        e.linkstep = (e.linkmax - e.linkmin) / 5;
+      } else if (e.linkRadio == 1) {
+        e.linkmin = e.rptResult.MaxMin.link.minVelocity;
+        e.linkmax = e.rptResult.MaxMin.link.maxVelocity;
+        e.linkstep = (e.linkmax - e.linkmin) / 5;
+      } else if (e.linkRadio == 2) {
+        e.linkmin = e.rptResult.MaxMin.link.minDepth;
+        e.linkmax = e.rptResult.MaxMin.link.maxDepth;
+        e.linkstep = (e.linkmax - e.linkmin) / 5;
+      } else if (e.linkRadio == 3) {
+        e.linkmin = e.rptResult.MaxMin.link.minCapacity;
+        e.linkmax = e.rptResult.MaxMin.link.maxCapacity;
+        e.linkstep = (e.linkmax - e.linkmin) / 5;
       }
-      this.map.setZoom(14);
-      this.map.setCenter({ lng: 120.845, lat: 31.037 });
-      this.sliderChange(33);
+      e.map.setZoom(14);
+      e.map.setCenter({ lng: 120.845, lat: 31.037 });
+      e.sliderChange(33);
     },
     handleClick() {},
     confirmLoad() {},
@@ -503,32 +541,12 @@ export default {
       // 更新openlayer
       // this.refreshOpenlayer();
     },
-    refreshOpenlayer() {
-      var feature = this.map.queryRenderedFeatures({
+    refreshOpenlayer(e) {
+      let feature = e.map.queryRenderedFeatures({
         layers: ["vectorLayer" + 0 + "point"],
       });
-      for (let i = 0; i < this.rptResult.Node.length; i++) {
-        // 更新geojsonObject
-        let feat = this.geojsonObject.features[i];
-        feature[i].properties.value = this.nodeResultArr[i][this.numberAnima];
-      }
       let ll = 1;
-      this.map.setPaintProperty("vectorLayer" + 0 + "point", "circle-color", [
-        "case",
-        ["<", ["get", "value"], this.nodemin],
-        "#fdd519", //<10.8
-        ["<", ["get", "value"], this.nodemin + ll * this.nodestep],
-        "#fdd519", //>=10.8 & <17.2
-        ["<", ["get", "value"], this.nodemin + (ll + 1) * this.nodestep],
-        "#f8a114",
-        ["<", ["get", "value"], this.nodemin + (ll + 2) * this.nodestep],
-        "#f36f0f",
-        ["<=", ["get", "value"], this.nodemin + (ll + 3) * this.nodestep],
-        "#ee430b",
-        ["<=", ["get", "value"], this.nodemin + (ll + 4) * this.nodestep],
-        "#e90806", //>=41.5 & <50.1
-        "#e90806", // 默认值, >=50.1
-      ]);
+      e.map.getSource("source-id" + 0).setData(e.geojsonObject);
     },
     formatTooltip(val) {
       if (this.rptResult.Date != undefined) {
@@ -548,11 +566,11 @@ export default {
           "November",
           "December",
         ];
-        var dateDay = this.rptResult.Date[val - 1].split(/ +/)[0];
-        var dateSec = this.rptResult.Date[val - 1].split(/ +/)[1];
-        var nyr = dateDay.split("-");
-        var hms = dateSec.split(":");
-        var dateStr = nyr[2] + "-" + nyr[1] + "-";
+        let dateDay = this.rptResult.Date[val - 1].split(/ +/)[0];
+        let dateSec = this.rptResult.Date[val - 1].split(/ +/)[1];
+        let nyr = dateDay.split("-");
+        let hms = dateSec.split(":");
+        let dateStr = nyr[2] + "-" + nyr[1] + "-";
         for (let i = 0; i < month.length; i++) {
           if (month[i].toLowerCase().includes(nyr[0].toLowerCase())) {
             dateStr += ("0" + (i + 1)).slice(-2) + " " + hms.join("-");
@@ -564,32 +582,30 @@ export default {
     startAnimation() {
       this.startBtn = true;
       this.pauseBtn = false;
-      this.intevalAnima = setInterval(() => {
-        if (this.numberAnima == this.rptResult.Date.length) {
-          this.numberAnima = 0;
-          this.timeSlider = 1;
+      let _this = this;
+      _this.intevalAnima = setInterval(() => {
+        if (_this.numberAnima == _this.rptResult.Date.length) {
+          _this.numberAnima = 0;
+          _this.timeSlider = 1;
         }
-        for (let i = 0; i < this.rptResult.Node.length; i++) {
+        for (let i = 0; i < _this.rptResult.Node.length; i++) {
           // 更新geojsonObject
-          let feat = this.geojsonObject.features[i];
-          this.geojsonObject.features[i].properties.value =
-            this.nodeResultArr[i][this.numberAnima];
-          // if(feat.properties.value!=0){
-          //   console.log(i)
-          // }
+          let feat = _this.geojsonObject.features[i];
+          _this.geojsonObject.features[i].properties.value =
+            _this.nodeResultArr[i][_this.numberAnima];
         }
-        for (let k = 0; k < this.rptResult.Link.length; k++) {
+        for (let k = 0; k < _this.rptResult.Link.length; k++) {
           // 更新geojsonObject
           let feat =
-            this.geojsonObject.features[this.rptResult.Node.length + k];
-          this.geojsonObject.features[
-            this.rptResult.Node.length + k
-          ].properties.value = this.linkResultArr[k][this.numberAnima];
+            _this.geojsonObject.features[_this.rptResult.Node.length + k];
+          _this.geojsonObject.features[
+            _this.rptResult.Node.length + k
+          ].properties.value = _this.linkResultArr[k][_this.numberAnima];
         }
         // 更新openlayer
-        this.refreshOpenlayer();
-        this.numberAnima++;
-        this.timeSlider++;
+        _this.refreshOpenlayer(_this);
+        _this.numberAnima++;
+        _this.timeSlider++;
       }, 1000);
     },
     pauseAnimation() {
