@@ -13,8 +13,8 @@ import $ from 'jquery';
 import VueAxios from 'vue-axios'
 import VueCodeHighlight from 'vue-code-highlight';
 import 'vue-code-highlight/themes/prism-coy.css'
-
-
+import echarts from 'echarts';
+import { Vue } from '@vueuse/core/node_modules/vue-demi'
 
 window.jQuery = $;
 window.$ = $;
