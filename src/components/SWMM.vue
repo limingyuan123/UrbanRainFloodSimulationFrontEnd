@@ -61,6 +61,7 @@
     </el-tabs>
   </div>
   <div id="map"></div>
+
   <div id="time-slider">
     <el-slider
       v-model="timeSlider"
@@ -91,7 +92,7 @@
 //样式引入
 import "mapbox-gl/dist/mapbox-gl.css";
 import "mapbox-gl";
-import { toRaw } from "@vue/reactivity";
+import * as echarts from "echarts";
 //定义变量使用
 const mapboxgl = require("mapbox-gl");
 export default {
@@ -206,10 +207,58 @@ export default {
           });
       });
     },
+    initEchart(x, y) {
+      var echar = echarts.init(document.getElementById("e_chart"));
+      let data = y.children.find(
+        (Flooding) => Flooding.value == "Flooding"
+      ).data;
+      let date = x;
+      // 指定图表的配置项和数据
+      var option1 = {
+        tooltip: {
+          trigger: "axis",
+        },
+        legend: {
+          data: ["近七日收益"],
+        },
+        grid: {
+          left: "3%",
+          right: "4%",
+          bottom: "3%",
+          containLabel: true,
+        },
+
+        toolbox: {
+          feature: {
+            saveAsImage: {},
+          },
+        },
+        xAxis: {
+          type: "category",
+          boundaryGap: false,
+          data: date,
+        },
+        yAxis: {
+          type: "value",
+        },
+
+        series: [
+          {
+            name: "近七日收益",
+            type: "line",
+            stack: "总量",
+            data: data,
+          },
+        ],
+      };
+      echar.clear();
+      echar.setOption(option1);
+    },
     openFileDialog() {
       let f = this.getrptResult(this);
       let ff = this.getGeojson(this);
       let _this = this;
+
       Promise.all([f, ff]).then((array) => {
         _this.rptResult = array[0];
         _this.geojsonObject = array[1];
@@ -294,17 +343,6 @@ export default {
           data: _this.geojsonObject,
         });
         let ll = 1;
-        // _this.map.addLayer({
-        //   id: "vectorLayer" + _this.layerNumber + "poly",
-        //   type: "fill",
-        //   source: "source-id" + _this.layerNumber,
-
-        //   paint: {
-        //     "fill-color": "#000000",
-        //     "fill-opacity": 0.1,
-        //   },
-        //   filters: ["in", "type", "MultiPolygon"],
-        // });
         _this.map.addLayer({
           id: "vectorLayer" + _this.layerNumber + "line",
           type: "line",
@@ -344,7 +382,7 @@ export default {
               "#140fb8", // 默认值, >=50.1
             ],
           },
-          filters: ["in", "type", "MultiLineString"],
+          filter: ["in", "$type", "LineString"],
         });
 
         _this.map.addLayer({
@@ -385,7 +423,7 @@ export default {
               "#e90806", // 默认值, >=50.1
             ],
           },
-          filters: ["in", "type", "Point"],
+          filter: ["in", "$type", "Point"],
         });
         _this.map.on(
           "mouseenter",
@@ -427,10 +465,17 @@ export default {
             while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
               coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
             }
+            let y = _this.options[0].children.find(
+              (child) => child.label == e.features[0].properties.name
+            );
+            let x = _this.rptResult.Date;
             new mapboxgl.Popup()
               .setLngLat(e.lngLat)
-              .setHTML("<p>图</p>")
+              .setHTML("<div id='e_chart' style='height:100%;width:100%;'></div>")
               .addTo(_this.map);
+            setTimeout(() => {
+              _this.initEchart(x, y);
+            }, 1);
           }
         );
         _this.layerNumber++;
@@ -441,16 +486,12 @@ export default {
         _this.marks = {
           1: _this.formatTooltip(1),
         };
-
         // btn
         _this.startBtn = false;
         _this.conduitStartBtn = false;
       });
-
-      // map Tab
-
-      //conduit
     },
+
     changeChooseMap(e) {
       // 还原slider
       e.numberAnima = 32;
@@ -646,6 +687,14 @@ export default {
   z-index: 10000;
   left: 0%;
 } */
+#e_chart .absolute {
+  position: absolute;
+  top: 80px;
+  right: 0;
+  width: 200px;
+  height: 100px;
+  border: 3px solid #73ad21;
+}
 .tool {
   background: white;
   height: calc(100vh - 120px);
