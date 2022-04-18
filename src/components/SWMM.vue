@@ -219,7 +219,7 @@ export default {
           trigger: "axis",
         },
         legend: {
-          data: ["近七日收益"],
+          data: ["Flooding"],
         },
         grid: {
           left: "3%",
@@ -244,9 +244,8 @@ export default {
 
         series: [
           {
-            name: "近七日收益",
+            name: "Flooding",
             type: "line",
-            stack: "总量",
             data: data,
           },
         ],
@@ -469,9 +468,9 @@ export default {
               (child) => child.label == e.features[0].properties.name
             );
             let x = _this.rptResult.Date;
-            new mapboxgl.Popup()
+            new mapboxgl.Popup({maxWidth:'800px'})
               .setLngLat(e.lngLat)
-              .setHTML("<div id='e_chart' style='height:100%;width:100%;'></div>")
+              .setHTML("<div id='e_chart' style='height:200px;width:200px;'></div>")
               .addTo(_this.map);
             setTimeout(() => {
               _this.initEchart(x, y);
@@ -681,12 +680,10 @@ export default {
 #map {
   height: calc(100vh - 120px);
 }
-/* .tool {
-  position: absolute;
-  top: 40%;
-  z-index: 10000;
-  left: 0%;
-} */
+.mapboxgl-popup {
+max-width: 800px;
+font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
 #e_chart .absolute {
   position: absolute;
   top: 80px;
