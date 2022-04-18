@@ -199,9 +199,8 @@
 <script>
 // import vkbeautify from "vkbeautify";
 import Navbar  from '../components/Navbar'
-import { UploadFilled,Bottom,Pointer,View,
-VideoPlay,Promotion } from '@element-plus/icons-vue'
-import { ref } from 'vue';
+import { UploadFilled,Bottom,Pointer,View,VideoPlay,Promotion } from '@element-plus/icons-vue'
+import { reactive, ref, computed } from 'vue';
 import { fa } from 'element-plus/lib/locale';
 export default {
   name:"Operation",
@@ -215,11 +214,20 @@ export default {
     Promotion,
     ref,
   },
-  data() {
-    return {
-      dialogVisible: false,
-      deployDocument: false,
-      list: [
+
+  setup(){
+      let dialog = reactive({
+          dialogVisible:false,
+          deployDocument: false,          
+      });
+
+      let loading = reactive({
+          loading: false,
+          downloadLoading:false,
+          downloadFileLoading:false,
+      });
+      
+      let list = [
         {
           oid: "3f6857ba-c2d2-4e27-b220-6e5367803a12",
           name: "SWMM",
@@ -246,19 +254,10 @@ export default {
           author: "Stephen Roberts，Ole Nielsen,Duncan Gray,Jane Sexton",
           select:false,
           output:'output_anuga',
-        }
-      ],
-      modelList: [],
-      modelConfig: [],
-      xml_show: "",
-      loadModel: {},
-      loadModels:[],
-      loading: false,
-      downloadLoading:false,
-      downloadFileLoading:false,
-      isShow:false,
-      labelPosition:'left',
-      output:[{
+        }        
+      ];
+      
+      let output = [{
           label:'1',
           path:'',
           value:'report1.rpt'
@@ -279,42 +278,49 @@ export default {
           path:'res_clip_testNoBciAndDoubleCouple1',
           value:'fenhu-0002.wd',
         },
-      ],
-      modelSelectStatus:'选择',
-      uploadFiles:[],
-      value:ref(''),
-      outputPath:'E:\\research\\yangtze_delta',
-    };
-  },
-  methods: {
+      ];
+      let value = ref('');
+      let xml_show = ref("");
+      let isShow = ref(false);
+      let labelPosition = ref('left');      
+      let modelSelectStatus = ref('选择');
+      let outputPath = ref('E:\\research\\yangtze_delta');
+      let modelData = reactive({
+        modelList: [],
+        modelConfig: [],
+        loadModel: {},
+        loadModels:[],
+        uploadFiles:[],
+      })
+
     //关闭dialogVisible对话框
-    handleClose(done) {
-      this.dialogVisible = false;
-    },
+    function handleClose(done) {
+      dialog.dialogVisible = false;
+    };
     //关闭deployDocument对话框
-    handleCloseDeployDocument(done) {
-      this.deployDocument = false;
-    },
+    function handleCloseDeployDocument(done) {
+      dialog.deployDocument = false;
+    };
     //搜索模型
-    searchModelItem() {},
+    function searchModelItem() {};
     //选择需要耦合的模型
-    selectModelItem(index, info) {
+    function selectModelItem(index, info) {
       let modelObj = {
         oid:info.oid,
         name:info.name,
         description:info.description,
         author:info.author,
       }
-      this.modelList.push(modelObj);
+      modelData.modelList.push(modelObj);
       this.$message({
         message:'选择模型成功',
         type:'success',
       })
       info.select = !info.select;
-    },
+    };
     //载入已选的模型
-    loadModelItem(index, info) {
-      this.xml_show = '';
+    function loadModelItem(index, info) {
+      xml_show = '';
       this.fileList = '';
       this.deployDocument = true;
       let modelObj = {
@@ -325,15 +331,15 @@ export default {
       }
       this.loadModel = modelObj;
       this.loadModels.push(modelObj);
-    },
+    };
     //调用上传的删除方法，清除上传文件列表
-    clearFiles(){
+    function clearFiles(){
       if(this.$refs['configUpload'] !== undefined){        
         this.$refs['configUpload'].clearFiles();
       }
-    },
+    };
     //上传文件，并展示内容到页面上
-    uploadChange(file, fileList) {
+    function uploadChange(file, fileList) {
       if (file.status !== 'ready') return;
       let fileObj = {
         file:fileList,
@@ -376,18 +382,18 @@ export default {
           this.$message.error("服务器error");
         }
       });
-    },
+    };
     //载入配置文件到模型模块化耦合控制区操作面板
-    confirmLoad() {    
+    function confirmLoad() {    
       this.modelConfig.push({
         name: this.loadModel.name,
         oid:this.loadModel.oid,
         configName: this.loadModel.name + ".conf",
       });
       this.deployDocument = false;
-    },
+    };
     //调用函数
-    invoke() {
+    function invoke() {
       //根据文件oid，调用exe，生成最终结果，并可视化
       let form = new FormData();
       let oid = '', oids = [];
@@ -395,47 +401,28 @@ export default {
         if(oid !== item.oid){
           oid = item.oid;
           oids.push(oid);
-        }  
+        }
       }
       if(oids.length < 2){
         this.$message({
           message:"模型数目不够2个，无法耦合",
           type:'error',
-        })        
+        })
       }else{
         form.append('oids', oids);
         this.loading = true;
         let _this = this;
-        //调用invoke接口
-        // this.axios.post('/api/invoke', form).then(res => {
-        //   if(res.status === 200){
-        //     let result = res.data;
-        //     if(result.code === 0){
-        //       this.$message({
-        //         message:'调用耦合方法成功！',
-        //         type:'success',
-        //       })
-        //       _this.outputPath = result.data;
-        //       _this.isShow = true;
-        //     }else{
-        //       this.$message.error(`调用耦合方法失败！,失败原因为：${result.message}`);
-        //     }            
-        //     _this.loading = false;
-        //   }else{
-        //     this.$message.error('服务器error');
-        //   }
-        // })
         setTimeout(() => {
           _this.isShow = true;
           _this.loading = false;
         }, 1000)
       }
-    },
+    };
     //配置文件下载函数
-    downloadConfig(oid){
+    function downloadConfig(oid){
       console.log(`oid 为 ${oid}`);
       if(oid === undefined){
-        this.$message({message:'该配置文件无oid，请检查！', type:'error'});
+        this.message({message:'该配置文件无oid，请检查！', type:'error'});
       }
       let form = new FormData();
       form.append('oid',oid);
@@ -444,54 +431,9 @@ export default {
       
       window.location.href = `/api/downloadConfig?oid=${oid}`;  
       this.downloadLoading = false;
-
-      // this.axios.get('/api/downloadConfig', {
-      //   params:{oid:oid},
-      //   responseType:'blob',
-      // }).then(res => {
-      //     _this.downloadLoading = false;
-      //     if(res.status === 200){
-      //     const content = res.data;
-      //     const blob = new Blob([content]);
-      //     if('download' in document.createElement('a')){
-      //       //非IE下载
-      //       const elink = document.createElement('a');
-      //       elink.download = _this.selected;
-      //       elink.style.display = 'none';
-      //       elink.href = window.URL.createObjectURL(blob);
-      //       document.body.appendChild(elink);
-      //       elink.click();
-      //       window.URL.revokeObjectURL(elink.href);
-      //       document.body.removeChild(elink);
-      //     }else{
-      //       //IE10+下载
-      //       if(typeof window.navigator.msSaveBlob !== 'undefined'){
-      //         window.navigator.msSaveBlob(blob, _this.selected);
-      //       }else{
-      //         let URL = window.URL || window.webkitURL;
-      //         let downloadUrl = URL.createObjectURL(blob);
-      //         window.location = downloadUrl;
-      //       }
-      //     }
-
-      //     let result = res.data;
-      //     if(result.code === -1){
-      //       this.message({
-      //         message:`下载配置文件失败,失败原因为：${result.message}`,
-      //         type:'error',
-      //       })
-      //       console.log(`下载配置文件失败,失败原因为：${result.message}`)
-      //     }//如果不为-1则成功下载，不需要弹框，直接下载即可
-      //   }else{
-      //     this.message({
-      //       message:'服务器相应失败',
-      //       type:'error',
-      //     })
-      //   }
-      // })
-    },
+    };
     //下载输出数据
-    downloadOutput(){
+    function downloadOutput(){
       if(this.selected === ''){
         this.$message({message:"未选择需要下载的文件，请先选择待下载文件！", type:"error"})
         return;
@@ -541,16 +483,25 @@ export default {
       }).catch(err => {
         console.log(err);
       })      
-    }
-  },
-  mounted() {
+    };
 
-  },
-  computed:{
-    selected(){
-      return this.value;
+    let selected = computed({
+        get(){
+            return value;
+        },
+        set(value){
+            value = value;
+        }
+    })
+
+    return {
+        dialog,loading,list,value,xml_show,isShow,modelData,
+        labelPosition,modelSelectStatus,outputPath,handleClose,
+        handleCloseDeployDocument,searchModelItem,selectModelItem,
+        loadModelItem,output,clearFiles,uploadChange,confirmLoad,
+        invoke,downloadConfig,downloadOutput,selected,
     }
-  }
+  },
 };
 </script>
 <style>
