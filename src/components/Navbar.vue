@@ -33,23 +33,22 @@
         <el-menu-item index="5" @click="turnToHelp"
           >Help</el-menu-item
         >
-        <!-- <el-submenu index="4">
-          <template slot="title">My workspace</template>
-          <el-menu-item index="4-1">option1</el-menu-item>
-          <el-menu-item index="4-2">option2</el-menu-item>
-          <el-menu-item index="4-3">option3</el-menu-item>
-        </el-submenu> -->
         <el-menu-item index="6"
           ><a href="http://opengmsteam.com/" target="_blank"
             >About us</a
           ></el-menu-item
         >
-        <el-menu-item index="7" style="margin-left: 25%;">
+        <el-menu-item v-show="!userState" index="7" style="margin-left: 25%;">
           <span @click="turnToLogin">Login</span>
         </el-menu-item>
-        <el-menu-item index="8">
+        <el-menu-item v-show="!userState" index="8">
           <span @click="turnToSign">Sign up</span>
-        </el-menu-item>
+        </el-menu-item>  
+        <div style="display:absolute!important;right:10px;">
+          <el-avatar v-if="this.$store.state.Authorization!=''"  src=
+          "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg">
+          </el-avatar>
+        </div>
       </el-menu>
     </div>
     <router-view></router-view>
@@ -70,12 +69,14 @@
 </template>
 
 <script>
+import {mapMutations} from 'vuex'
 export default {
   name: "Navbar",
   data() {
     return {
       isCollapse: false,
       activeNavIndex: "",
+      userState:false,
     };
   },
   computed: {},
@@ -109,7 +110,14 @@ export default {
     },
     turnToHelp(){
       alert("hello im help sir");
-    }
+    },
+    setUserState(){
+      this.userState = localStorage.getItem('Authorization');
+    },
+  },
+  mounted(){
+    //判断当前是否有用户登录
+    this.setUserState();
   }
 };
 </script>

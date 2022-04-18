@@ -199,7 +199,8 @@
 <script>
 // import vkbeautify from "vkbeautify";
 import Navbar  from '../components/Navbar'
-import { UploadFilled,Bottom,Pointer,View,VideoPlay,Promotion } from '@element-plus/icons-vue'
+import { UploadFilled,Bottom,Pointer,View,
+VideoPlay,Promotion } from '@element-plus/icons-vue'
 import { ref } from 'vue';
 import { fa } from 'element-plus/lib/locale';
 export default {
@@ -434,7 +435,7 @@ export default {
     downloadConfig(oid){
       console.log(`oid 为 ${oid}`);
       if(oid === undefined){
-        this.message({message:'该配置文件无oid，请检查！', type:'error'});
+        this.$message({message:'该配置文件无oid，请检查！', type:'error'});
       }
       let form = new FormData();
       form.append('oid',oid);
