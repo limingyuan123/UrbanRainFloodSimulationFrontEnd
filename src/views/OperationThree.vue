@@ -401,13 +401,13 @@ export default {
         if(oid !== item.oid){
           oid = item.oid;
           oids.push(oid);
-        }  
+        }
       }
       if(oids.length < 2){
         this.$message({
           message:"模型数目不够2个，无法耦合",
           type:'error',
-        })        
+        })
       }else{
         form.append('oids', oids);
         this.loading = true;
