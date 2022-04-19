@@ -633,7 +633,9 @@ export default {
       // this.refreshOpenlayer();
     },
     refreshOpenlayer(e) {
-      e.map.getSource("source-id" + (this.layerNumber-1)).setData(e.geojsonObject);
+      e.map
+        .getSource("source-id" + (this.layerNumber - 1))
+        .setData(e.geojsonObject);
     },
     formatTooltip(val) {
       if (this.rptResult.Date != undefined) {
@@ -703,7 +705,6 @@ export default {
 
       clearInterval(this.intevalAnima);
     },
-    addLayer() {},
   },
 };
 </script>
