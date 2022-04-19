@@ -633,11 +633,9 @@ export default {
       // this.refreshOpenlayer();
     },
     refreshOpenlayer(e) {
-      let feature = e.map.queryRenderedFeatures({
-        layers: ["vectorLayer" + 0 + "point"],
-      });
-      let ll = 1;
-      e.map.getSource("source-id" + 0).setData(e.geojsonObject);
+      e.map
+        .getSource("source-id" + (this.layerNumber - 1))
+        .setData(e.geojsonObject);
     },
     formatTooltip(val) {
       if (this.rptResult.Date != undefined) {
@@ -707,7 +705,6 @@ export default {
 
       clearInterval(this.intevalAnima);
     },
-    addLayer() {},
   },
 };
 </script>
