@@ -553,7 +553,7 @@ export default {
   }
 };
 </script>
-<style>
+<style scoped>
 .parent {
   border: 1px solid #222;
   display: flex; /*设为伸缩容器*/
