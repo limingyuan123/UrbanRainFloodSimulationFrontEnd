@@ -59,7 +59,7 @@
             }
         },
         methods: {
-            ...mapMutations(['setLogin']),
+            ...mapMutations(['setLogin', 'setIndex']),
             updateVerifyCode() {
                 this.vcUrl = '/verifyCode?time='+new Date();
             },
@@ -78,8 +78,8 @@
                                 if(data.code == 0){
                                     //存储到state中
                                     _this.setLogin({Authorization:data.data.uid, userName:data.data.account})
-
-                                    _this.$router.replace('/operation');
+                                    _this.setIndex('1');
+                                    _this.$router.replace('/home');
                                 }else{
                                     _this.$message({message:`登陆失败，${data.message}`, type:'error'})
                                     _this.loading = false;
