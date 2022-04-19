@@ -6,7 +6,7 @@
       id="logo"
       class="pic"
       style="cursor:pointer;"
-      @click="toOperation"
+      @click="toHome"
     />
     <!-- header -->
     <div>
@@ -19,7 +19,7 @@
         text-color="#fff"
         active-text-color="#ffd04b"
       >
-        <el-menu-item index="1" style="margin-left:20%" @click="turnToHome"
+        <el-menu-item index="1" style="margin-left:20%" @click="toHome"
           >Home</el-menu-item
         >
         <el-menu-item index="2" @click="toOperation"
@@ -62,7 +62,7 @@
                  <el-divider />
                 <span style="">{{this.$store.state.userName}}</span>
               </el-dropdown-item>
-              <el-dropdown-item @click="turnToHome">Home</el-dropdown-item>
+              <el-dropdown-item @click="toHome">Home</el-dropdown-item>
               <el-dropdown-item @click="toOperation">Operation</el-dropdown-item>
               <el-dropdown-item @click="logOut">登出</el-dropdown-item>
             </el-dropdown-menu>
@@ -113,7 +113,7 @@ export default {
     handleSelect(key, keyPath) {
       console.log(key, keyPath);
     },
-    turnToHome() {
+    toHome() {
       // this.activeNavIndex = '1';
       this.setIndex('1');
       this.$router.replace("/home");

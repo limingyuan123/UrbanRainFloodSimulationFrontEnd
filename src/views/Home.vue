@@ -15,7 +15,7 @@
     <!-- 介绍部分的菜单 -->
     <div class="left_menu" id="left_menu">
       <li class="liContainer">
-        <strong class="menuFont">Getting Start</strong>
+        <strong class="menuFont">功能菜单</strong>
       </li>
       <li class="liContainer active">
         <a href="#" class="menuFont" @click="active($event)">Welcome</a>
