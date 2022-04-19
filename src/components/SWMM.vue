@@ -17,7 +17,7 @@
         <el-button
           class="file"
           style="background: #d4d7d8; margin: 5px"
-          @click="openFileDialog()"
+          @click="openFileDialog('/quo_5.disp', '/quo2.geojson')"
         >
           <h2 style="margin: 5px">五年一遇降水</h2>
           <p>选择该降水数据，展示模拟结果</p>
@@ -25,7 +25,7 @@
         <el-button
           class="file"
           style="background: #d4d7d8; margin: 5px"
-          @click="loadDispRes(tenNow)"
+          @click="openFileDialog('/quo_10.disp', '/quo2.geojson')"
         >
           <h2 style="margin: 5px">十年一遇降水</h2>
           <p>选择该降水数据，展示模拟结果</p>
@@ -33,7 +33,7 @@
         <el-button
           class="file"
           style="background: #d4d7d8; margin: 5px"
-          @click="loadFenhuLayer(0, '20year', 0)"
+          @click="openFileDialog('/quo_20.disp', '/quo2.geojson')"
         >
           <h2 style="margin: 5px">二十年一遇降水</h2>
           <p>选择该降水数据，展示模拟结果</p>
@@ -41,7 +41,7 @@
         <el-button
           class="file"
           style="background: #d4d7d8; margin: 5px"
-          @click="loadFenhuLayer(0, '30year', 0)"
+          @click="openFileDialog('/quo_30.disp', '/quo2.geojson')"
         >
           <h2 style="margin: 5px">三十年一遇降水</h2>
           <p>选择该降水数据，展示模拟结果</p>
@@ -49,7 +49,7 @@
         <el-button
           class="file"
           style="background: #d4d7d8; margin: 5px"
-          @click="loadFenhuLayer(0, '50year', 0)"
+          @click="openFileDialog('/quo_50.disp', '/quo2.geojson')"
         >
           <h2 style="margin: 5px">五十年一遇降水</h2>
           <p>选择该降水数据，展示模拟结果</p>
@@ -114,6 +114,7 @@ export default {
       geojsonLayer: Object,
       viewer: Object,
       fileList: [],
+      flag: -1,
       swmmVisualDialog: false,
       echartsDialog: false,
       activeName: "first",
@@ -183,10 +184,10 @@ export default {
     handleClose(key, keyPath) {
       console.log(key, keyPath);
     },
-    getrptResult(e) {
+    getrptResult(e, url) {
       return new Promise((resolve, reject) => {
         e.axios
-          .get("/quo_5.disp")
+          .get(url)
           .then((res) => {
             resolve(res.data);
           })
@@ -195,10 +196,10 @@ export default {
           });
       });
     },
-    getGeojson(e) {
+    getGeojson(e, url) {
       return new Promise((resolve, reject) => {
         e.axios
-          .get("/quo2.geojson")
+          .get(url)
           .then((res) => {
             resolve(res.data);
           })
@@ -207,11 +208,10 @@ export default {
           });
       });
     },
-    initEchart(x, y) {
-      var echar = echarts.init(document.getElementById("e_chart"));
-      let data = y.children.find(
-        (Flooding) => Flooding.value == "Flooding"
-      ).data;
+    initEchart(x, y, id, chart_name) {
+      echarts.init(document.getElementById(id)).dispose();
+      var echar = echarts.init(document.getElementById(id));
+      let data = y;
       let date = x;
       // 指定图表的配置项和数据
       var option1 = {
@@ -219,7 +219,7 @@ export default {
           trigger: "axis",
         },
         legend: {
-          data: ["Flooding"],
+          data: [chart_name],
         },
         grid: {
           left: "3%",
@@ -244,7 +244,7 @@ export default {
 
         series: [
           {
-            name: "Flooding",
+            name: chart_name,
             type: "line",
             data: data,
           },
@@ -253,9 +253,9 @@ export default {
       echar.clear();
       echar.setOption(option1);
     },
-    openFileDialog() {
-      let f = this.getrptResult(this);
-      let ff = this.getGeojson(this);
+    openFileDialog(disp_url, geo_url) {
+      let f = this.getrptResult(this, disp_url);
+      let ff = this.getGeojson(this, geo_url);
       let _this = this;
 
       Promise.all([f, ff]).then((array) => {
@@ -456,6 +456,7 @@ export default {
           "click",
           "vectorLayer" + _this.layerNumber + "point",
           (e) => {
+            e.preventDefault();
             // Copy coordinates array.
             const coordinates = e.features[0].geometry.coordinates.slice();
             // Ensure that if the map is zoomed out such that multiple
@@ -464,17 +465,52 @@ export default {
             while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
               coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
             }
-            let y = _this.options[0].children.find(
-              (child) => child.label == e.features[0].properties.name
-            );
+            let y = _this.options[0].children
+              .find((child) => child.label == e.features[0].properties.name)
+              .children.find((Flooding) => Flooding.value == "Flooding").data;
             let x = _this.rptResult.Date;
-            new mapboxgl.Popup({maxWidth:'800px'})
+            new mapboxgl.Popup({ maxWidth: "800px" })
               .setLngLat(e.lngLat)
-              .setHTML("<div id='e_chart' style='height:200px;width:200px;'></div>")
+              .setHTML(
+                "<div id=" +
+                  "e_chart_P" +
+                  " style='height:400px;width:600px;'></div>"
+              )
               .addTo(_this.map);
             setTimeout(() => {
-              _this.initEchart(x, y);
+              _this.initEchart(x, y, "e_chart_P", "Flooding");
             }, 1);
+          }
+        );
+        _this.map.on(
+          "click",
+          "vectorLayer" + _this.layerNumber + "line",
+          (e) => {
+            if (e.defaultPrevented) {
+            } else {
+              // Copy coordinates array.
+              const coordinates = e.features[0].geometry.coordinates.slice();
+              // Ensure that if the map is zoomed out such that multiple
+              // copies of the feature are visible, the popup appears
+              // over the copy being pointed to.
+              while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+              }
+
+              let y = _this.options[1].children
+                .find((child) => child.label == e.features[0].properties.name)
+                .children.find((Flooding) => Flooding.value == "Depth").data;
+              let x = _this.rptResult.Date;
+              new mapboxgl.Popup({ maxWidth: "800px" })
+                .setLngLat(e.lngLat)
+                .setHTML(
+                  "<div id='e_chart' style='height:400px;width:600px;'></div>"
+                )
+                .addTo(_this.map);
+              setTimeout(() => {
+                _this.initEchart(x, y, "e_chart", "Depth");
+              }, 1);
+            }
           }
         );
         _this.layerNumber++;
@@ -493,8 +529,8 @@ export default {
 
     changeChooseMap(e) {
       // 还原slider
-      e.numberAnima = 32;
-      e.timeSlider = 33;
+      e.numberAnima = 0;
+      e.timeSlider = 1;
 
       e.loading = true;
       e.propertySelectVisible = false;
@@ -503,24 +539,24 @@ export default {
       e.linkResultArr = [];
       for (let i = 0; i < e.options[0].children.length; i++) {
         // node
-        var node = e.options[0].children[i];
-        var element = node.children[e.nodeRadio];
+        let node = e.options[0].children[i];
+        let element = node.children[e.nodeRadio];
         e.nodeResultArr.push(element.data); // 汇总该属性的所有模拟值
       }
       for (let k = 0; k < e.rptResult.Node.length; k++) {
         // 更新geojsonObject
-        var feat = e.geojsonObject.features[k];
+        let feat = e.geojsonObject.features[k];
         feat.properties.value = e.nodeResultArr[k][0];
       }
       for (let i = 0; i < e.options[1].children.length; i++) {
         // link
-        var link = e.options[1].children[i];
-        var element = link.children[e.linkRadio];
+        let link = e.options[1].children[i];
+        let element = link.children[e.linkRadio];
         e.linkResultArr.push(element.data);
       }
       for (let k = 0; k < e.rptResult.Link.length; k++) {
         // 更新geojsonObject
-        var feat = e.geojsonObject.features[e.rptResult.Node.length + k];
+        let feat = e.geojsonObject.features[e.rptResult.Node.length + k];
         feat.properties.value = e.linkResultArr[k][0];
       }
       // 获取最大最小值
@@ -564,7 +600,7 @@ export default {
       }
       e.map.setZoom(14);
       e.map.setCenter({ lng: 120.845, lat: 31.037 });
-      e.sliderChange(33);
+      e.sliderChange(1);
     },
     handleClick() {},
     confirmLoad() {},
@@ -625,10 +661,10 @@ export default {
         let dateSec = this.rptResult.Date[val - 1].split(/ +/)[1];
         let nyr = dateDay.split("-");
         let hms = dateSec.split(":");
-        let dateStr = nyr[2] + "-" + nyr[1] + "-";
+        let dateStr = nyr[2] + "/" + nyr[1] + "/";
         for (let i = 0; i < month.length; i++) {
           if (month[i].toLowerCase().includes(nyr[0].toLowerCase())) {
-            dateStr += ("0" + (i + 1)).slice(-2) + " " + hms.join("-");
+            dateStr += ("0" + (i + 1)).slice(-2) + " " + hms.join(":");
           }
         }
         return dateStr;
@@ -681,8 +717,8 @@ export default {
   height: calc(100vh - 120px);
 }
 .mapboxgl-popup {
-max-width: 800px;
-font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  max-width: 800px;
+  font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
 }
 #e_chart .absolute {
   position: absolute;
