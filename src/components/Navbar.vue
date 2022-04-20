@@ -102,7 +102,7 @@ export default {
     };
   },
   computed: {},
-  methods: {    
+  methods: {
     ...mapMutations(['setLogin', 'setIndex']),
     handleOpen(key, keyPath) {
       console.log(key, keyPath);

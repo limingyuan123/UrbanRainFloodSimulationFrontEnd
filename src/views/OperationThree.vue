@@ -102,11 +102,12 @@
           type="primary"
           plain
           style="margin:10px;position:relative;left: 40%;top: 20px;"
+          @click="showMap"
           >
-          <router-link to="couple">
+          <!-- <router-link to="couple"> -->
             <el-icon style="margin-right:5px"><promotion /></el-icon>
             耦合结果展示
-          </router-link>
+          <!-- </router-link> -->
         </el-button>
          
       </el-card>
@@ -200,8 +201,13 @@
 // import vkbeautify from "vkbeautify";
 import Navbar  from '../components/Navbar'
 import { UploadFilled,Bottom,Pointer,View,VideoPlay,Promotion } from '@element-plus/icons-vue'
-import { reactive, ref, computed } from 'vue';
+import { reactive, ref, computed ,toRefs} from 'vue';
+import axios from 'axios'
+import {ElMessage } from 'element-plus'
 import { fa } from 'element-plus/lib/locale';
+import {
+  useRouter
+} from 'vue-router'
 export default {
   name:"Operation",
   components:{
@@ -221,12 +227,26 @@ export default {
           deployDocument: false,          
       });
 
-      let loading = reactive({
+      let load = reactive({
           loading: false,
           downloadLoading:false,
           downloadFileLoading:false,
       });
       
+      let modelData = reactive({
+        modelList: [],
+        modelConfig: [],
+        loadModel: {},
+        loadModels:[],
+        uploadFiles:[],
+      })
+      let configUpload = ref();
+      let value = ref('');
+      let xml_show = ref("");
+      let isShow = ref(false);
+      let labelPosition = ref('left');
+      let outputPath = ref('E:\\research\\yangtze_delta');
+
       let list = [
         {
           oid: "3f6857ba-c2d2-4e27-b220-6e5367803a12",
@@ -279,32 +299,20 @@ export default {
           value:'fenhu-0002.wd',
         },
       ];
-      let value = ref('');
-      let xml_show = ref("");
-      let isShow = ref(false);
-      let labelPosition = ref('left');      
-      let modelSelectStatus = ref('选择');
-      let outputPath = ref('E:\\research\\yangtze_delta');
-      let modelData = reactive({
-        modelList: [],
-        modelConfig: [],
-        loadModel: {},
-        loadModels:[],
-        uploadFiles:[],
-      })
-
+      
+    //#region 
     //关闭dialogVisible对话框
-    function handleClose(done) {
+    const handleClose = (done) => {
       dialog.dialogVisible = false;
     };
     //关闭deployDocument对话框
-    function handleCloseDeployDocument(done) {
+    const handleCloseDeployDocument = (done) => {
       dialog.deployDocument = false;
     };
     //搜索模型
-    function searchModelItem() {};
+    const searchModelItem = () => {};
     //选择需要耦合的模型
-    function selectModelItem(index, info) {
+    const selectModelItem = (index, info)  =>{
       let modelObj = {
         oid:info.oid,
         name:info.name,
@@ -312,52 +320,52 @@ export default {
         author:info.author,
       }
       modelData.modelList.push(modelObj);
-      this.$message({
+      ElMessage({
         message:'选择模型成功',
         type:'success',
       })
       info.select = !info.select;
     };
     //载入已选的模型
-    function loadModelItem(index, info) {
-      xml_show = '';
+    const loadModelItem = (index, info)  =>{
+      xml_show.value = '';
       this.fileList = '';
-      this.deployDocument = true;
+      dialog.deployDocument = true;
       let modelObj = {
         oid:info.oid,
         name:info.name,
         description:info.description,
         author:info.author,
       }
-      this.loadModel = modelObj;
-      this.loadModels.push(modelObj);
+      modelData.loadModel = modelObj;
+      modelData.loadModels.push(modelObj);
     };
     //调用上传的删除方法，清除上传文件列表
-    function clearFiles(){
-      if(this.$refs['configUpload'] !== undefined){        
-        this.$refs['configUpload'].clearFiles();
+    const clearFiles = () => {
+      if(configUpload.value !== undefined){     
+        configUpload.value.clearFiles();
       }
     };
     //上传文件，并展示内容到页面上
-    function uploadChange(file, fileList) {
+    const uploadChange = (file, fileList)  =>{
       if (file.status !== 'ready') return;
       let fileObj = {
         file:fileList,
-        name:this.loadModel.name,
-        description:this.loadModel.description,
-        author:this.loadModel.author,        
-        oid:this.loadModel.oid,
+        name:modelData.loadModel.name,
+        description:modelData.loadModel.description,
+        author:modelData.loadModel.author,        
+        oid:modelData.loadModel.oid,
       }
-      this.uploadFiles.push(fileObj);
+      modelData.uploadFiles.push(fileObj);
       
       let _this = this;
       let form = new FormData();
-      for (let i = 0; i < this.uploadFiles.length; i++) {
+      for (let i = 0; i < modelData.uploadFiles.length; i++) {
         //上传文件信息以及模型信息
-        form.append("datafile", this.uploadFiles[i].raw);
+        form.append("datafile", modelData.uploadFiles[i].raw);
       }
 
-      for(let item of this.uploadFiles){
+      for(let item of modelData.uploadFiles){
         //上传文件信息以及模型信息
         form.append("datafile", item.file[0].raw);
         form.append("name", item.name);
@@ -365,105 +373,105 @@ export default {
         form.append("author", item.author);
         form.append("oid", item.oid);
       }
-      this.axios.post("/api/coupleDocument", form).then(res => {
+      axios.post("/api/coupleDocument", form).then(res => {
         //解析该文件，返回xml字符串，赋值给xml_show
         if (res.status === 200) {
           let result = res.data;
           if (result.code === 0) {
-            this.$message({
+            ElMessage({
               message: "载入成功",
               type: "success"
             });
-            _this.xml_show = result.data;
+            xml_show.value = result.data;
           } else {
-            this.$message.error("载入失败");
+            ElMessage.error("载入失败");
           }
         } else {
-          this.$message.error("服务器error");
+          ElMessage.error("服务器error");
         }
       });
     };
     //载入配置文件到模型模块化耦合控制区操作面板
-    function confirmLoad() {    
-      this.modelConfig.push({
-        name: this.loadModel.name,
-        oid:this.loadModel.oid,
-        configName: this.loadModel.name + ".conf",
+    const confirmLoad = () => {    
+      modelData.modelConfig.push({
+        name: modelData.loadModel.name,
+        oid:modelData.loadModel.oid,
+        configName: modelData.loadModel.name + ".conf",
       });
-      this.deployDocument = false;
+      dialog.deployDocument = false;
     };
     //调用函数
-    function invoke() {
+    const invoke = ()  =>{
       //根据文件oid，调用exe，生成最终结果，并可视化
       let form = new FormData();
       let oid = '', oids = [];
-      for(let item of this.loadModels){
+      for(let item of modelData.loadModels){
         if(oid !== item.oid){
           oid = item.oid;
           oids.push(oid);
         }
       }
       if(oids.length < 2){
-        this.$message({
+        ElMessage({
           message:"模型数目不够2个，无法耦合",
           type:'error',
         })
       }else{
         form.append('oids', oids);
-        this.loading = true;
+        load.loading = true;
         let _this = this;
         setTimeout(() => {
-          _this.isShow = true;
-          _this.loading = false;
+          isShow.value = true;
+          load.loading = false;
         }, 1000)
       }
     };
     //配置文件下载函数
-    function downloadConfig(oid){
+    const downloadConfig = (oid) =>{
       console.log(`oid 为 ${oid}`);
       if(oid === undefined){
-        this.message({message:'该配置文件无oid，请检查！', type:'error'});
+        ElMessage({message:'该配置文件无oid，请检查！', type:'error'});
       }
       let form = new FormData();
       form.append('oid',oid);
-      this.downloadLoading = true;
+      load.downloadLoading = true;
       // let _this = this;
       
       window.location.href = `/api/downloadConfig?oid=${oid}`;  
-      this.downloadLoading = false;
+      load.downloadLoading = false;
     };
     //下载输出数据
-    function downloadOutput(){
-      if(this.selected === ''){
-        this.$message({message:"未选择需要下载的文件，请先选择待下载文件！", type:"error"})
+    const downloadOutput = () =>{
+      if(selected.value === ''){
+        ElMessage({message:"未选择需要下载的文件，请先选择待下载文件！", type:"error"})
         return;
       }
       //拼写出下载的文件路径
       let path = '';
-      for(let item of this.output){
-        if(item.value === this.selected){
+      for(let item of output){
+        if(item.value === selected.value){
           if(item.path === ''){
-            path = this.outputPath + '/' + this.selected;
+            path = outputPath.value + '/' + selected.value;
           }else{
-            path = this.outputPath + '/' + item.path + '/' + this.selected;
+            path = outputPath.value + '/' + item.path + '/' + selected.value;
           }          
           break;
         }
       }
       let form = new FormData();
       form.append('filePath', path);
-      this.downloadFileLoading = true;
+      load.downloadFileLoading = true;
       let _this = this;
       //利用blob实现axios下载,超时时间五分钟
-      this.axios.post('/api/downloadFile', form, {responseType:'blob'},{timeout:30000}).then(res => {
-        _this.downloadFileLoading = false;
+      axios.post('/api/downloadFile', form, {responseType:'blob'},{timeout:30000}).then(res => {
+        load.downloadFileLoading = false;
 
         const content = res.data;
         const blob = new Blob([content]);
         if('download' in document.createElement('a')){
           //非IE下载
           const elink = document.createElement('a');
-          elink.download = _this.selected;
+          elink.download = selected.value;
           elink.style.display = 'none';
           elink.href = window.URL.createObjectURL(blob);
           document.body.appendChild(elink);
@@ -473,7 +481,7 @@ export default {
         }else{
           //IE10+下载
           if(typeof window.navigator.msSaveBlob !== 'undefined'){
-            window.navigator.msSaveBlob(blob, _this.selected);
+            window.navigator.msSaveBlob(blob, selected.value);
           }else{
             let URL = window.URL || window.webkitURL;
             let downloadUrl = URL.createObjectURL(blob);
@@ -485,21 +493,31 @@ export default {
       })      
     };
 
+    const showMap = () => {
+      
+      router.push('/show')
+    }
+    //#endregion
+
     let selected = computed({
         get(){
-            return value;
+            return value.value;
         },
         set(value){
-            value = value;
+            value.value = value;
         }
     })
 
     return {
-        dialog,loading,list,value,xml_show,isShow,modelData,
-        labelPosition,modelSelectStatus,outputPath,handleClose,
-        handleCloseDeployDocument,searchModelItem,selectModelItem,
-        loadModelItem,output,clearFiles,uploadChange,confirmLoad,
-        invoke,downloadConfig,downloadOutput,selected,
+        ...toRefs(dialog),
+        ...toRefs(load),
+        ...toRefs(modelData),
+        list,output,
+        value,xml_show,isShow,
+        labelPosition,outputPath,
+        handleClose,handleCloseDeployDocument,searchModelItem,
+        selectModelItem,loadModelItem,clearFiles,uploadChange,
+        confirmLoad,invoke,downloadConfig,downloadOutput,selected,configUpload,
     }
   },
 };
