@@ -4,6 +4,7 @@ import Couple from '../views/Couple.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 import Operation from '../views/Operation.vue'
+import OperationThree from '../views/OperationThree.vue'
 const routes = [
   {
     path: '/',
@@ -15,6 +16,11 @@ const routes = [
     path: '/operation',
     name: 'Operation',
     component: Operation,
+  },
+  {
+    path: '/operationthree',
+    name: 'OperationThree',
+    component: OperationThree,
   },
   {
     path: '/couple',
