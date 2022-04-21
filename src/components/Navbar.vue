@@ -86,77 +86,63 @@
   </div>
 </template>
 
-<script>
-import {mapMutations} from 'vuex'
+<script setup>
+import {mapMutations, useStore} from 'vuex'
 import { ArrowDown } from '@element-plus/icons-vue'
-export default {
-  name: "Navbar",
-  components:{
-    ArrowDown,
-  },
-  data() {
-    return {
-      isCollapse: false,
-      activeNavIndex: "1",
-      userName:'',
-    };
-  },
-  computed: {},
-  methods: {
-    ...mapMutations(['setLogin', 'setIndex']),
-    handleOpen(key, keyPath) {
-      console.log(key, keyPath);
-    },
-    handleClose(key, keyPath) {
-      console.log(key, keyPath);
-    },
-    handleSelect(key, keyPath) {
-      console.log(key, keyPath);
-    },
-    toHome() {
-      // this.activeNavIndex = '1';
-      this.setIndex('1');
-      this.$router.replace("/home");
-    },
-    turnToLogin() {
-      this.setIndex('');
-      this.$router.replace("/login");
-    },
-    turnToSign() {
-      this.setIndex('');
-      this.$router.replace("/register");
-    },
-    turnToTemplate() {
-      this.$router.replace("/template");
-    },
-    turnToService(){
-      this.$router.replace("/service");
-    },
-    turnToProject(){
-      this.$router.replace("/project");
-    },
-    turnToHelp(){
-      alert("hello im help sir");
-    },
-    toOperation(){
-      // this.activeNavIndex = '2';
-      
-      this.setIndex('2');
-      this.$router.replace("/operation");
-    },
-    toShow(){
-      // this.activeNavIndex = '3';
-      this.setIndex('3');
-      this.$router.replace("/couple");
-    },
-    logOut(){
-      this.setLogin({Authorization:'', userName:''});
-    }
-  },
-  mounted(){
-    this.activeNavIndex = this.$store.state.index;
-  }
+import {onMounted, ref, toRef} from 'vue';
+import {  useRouter} from 'vue-router'
+const router = useRouter();
+const store = useStore();
+let activeNavIndex = ref("1");
+const {setLogin:[setLogin]} = store._mutations;
+const {setIndex:[setIndex]} = store._mutations;
+const handleOpen = (key, keyPath)  => {
+  console.log(key, keyPath);
 };
+const handleClose = (key, keyPath)  => {
+  console.log(key, keyPath);
+};
+const handleSelect = (key, keyPath)  => {
+  console.log(key, keyPath);
+};
+const toHome = ()  => {
+  setIndex('1');      
+  router.push('/home')
+};
+const turnToLogin = ()  => {
+  setIndex('');
+  router.push('/login')
+};
+const turnToSign = ()  => {
+  setIndex('');
+  router.push('/register')
+};
+const turnToTemplate = ()  => {
+  router.push('/template')
+};
+const turnToService = () => {
+  router.push('/service')
+};
+const turnToProject = () => {
+  router.push('/project')
+};
+const turnToHelp = () => {
+  alert("hello im help sir");
+};
+const toOperation = () => {      
+  setIndex('2');
+  router.push('/operation')
+};
+const toShow = () => {
+  setIndex('3');
+  router.push('/couple')
+};
+const logOut = () => {
+  setLogin({Authorization:'', userName:''});
+}
+onMounted(() => {
+  activeNavIndex.value = store.state.index;
+})
 </script>
 <style>
   
