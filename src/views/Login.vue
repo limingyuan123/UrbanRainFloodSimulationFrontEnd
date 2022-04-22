@@ -5,22 +5,22 @@
         </div>
         <el-form
                 :rules="rules"
-                ref="loginForm"
+                ref="formRef"
                 v-loading="loading"                
                 :model="loginForm"
                 class="loginContainer">
             <h3 class="loginTitle">系统登录</h3>
             <el-form-item prop="username">
-                <el-input size="normal" type="text" v-model="loginForm.username" auto-complete="off"
+                <el-input size="normal" type="text" v-model="username" auto-complete="off"
                           placeholder="请输入用户名"></el-input>
             </el-form-item>
             <el-form-item prop="password">
-                <el-input size="normal" type="password" v-model="loginForm.password" auto-complete="off"
+                <el-input size="normal" type="password" v-model="password" auto-complete="off"
                           placeholder="请输入密码"></el-input>
             </el-form-item>            
             <el-checkbox size="normal" class="loginRemember" v-model="checked">记住用户名与密码</el-checkbox>
             <div class="loginButton">
-                <el-button class="login" size="normal" type="primary" @click="submitLogin">登录</el-button>
+                <el-button class="login" size="normal" type="primary" @click="submitLogin(formRef)">登录</el-button>
                 <el-button class="register" size="normal">
                     <router-link to="register" custom v-slot="{ navigate }">
                         	<span @click="navigate" @keypress.enter="navigate" role="link">
@@ -33,67 +33,62 @@
     </div>
 </template>
 
-<script>
-    import Navbar  from '../components/Navbar';
-    import { mapMutations } from 'vuex';
-    export default {
-        name: "Login",
-        components:{
-            Navbar,
-
-        },
-        data() {
-            return {
-                loading: false,
-                vcUrl: '/verifyCode?time='+new Date(),
-                loginForm: {
-                    username: '',
-                    password: '',
-                    code:''
-                },
-                checked: true,
-                rules: {
-                    username: [{required: true, message: '用户名不能为空', trigger: 'blur'}],
-                    password: [{required: true, message: '密码不能为空', trigger: 'blur'}],
-                }
-            }
-        },
-        methods: {
-            ...mapMutations(['setLogin', 'setIndex']),
-            updateVerifyCode() {
-                this.vcUrl = '/verifyCode?time='+new Date();
-            },
-            submitLogin() {
-                let _this = this;
-                this.$refs.loginForm.validate((valid) => {
-                    if (valid) {
-                        _this.loading = true;
-                        var userJson = {};
-                        userJson["name"] = _this.loginForm.username;
-                        userJson["password"] = _this.loginForm.password;
-                        _this.axios
-                            .post("/api/login", userJson)
-                            .then(res => {
-                                let data = res.data;
-                                if(data.code == 0){
-                                    //存储到state中
-                                    _this.setLogin({Authorization:data.data.uid, userName:data.data.account})
-                                    _this.setIndex('1');
-                                    _this.$router.replace('/home');
-                                }else{
-                                    _this.$message({message:`登陆失败，${data.message}`, type:'error'})
-                                    _this.loading = false;
-                                }
-                            })
+<script setup>
+import Navbar  from '../components/Navbar';
+import { useStore } from 'vuex';
+import { reactive, ref, toRefs } from 'vue';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
+import { ElMessage } from 'element-plus/lib/components';
+import { FormInstance } from 'element-plus';
+const store = useStore();
+const {setLogin:[setLogin]} = store._mutations;
+const {setIndex:[setIndex]} = store._mutations;
+const router = useRouter();
+let loading = ref(false);
+let formRef = ref();
+let vcUrl = ref('/verifyCode?time='+new Date());
+let loginForm = reactive({
+    username: '',
+    password: '',
+    code:''
+});
+let {username, password, code} = toRefs(loginForm);
+let checked = ref(true);
+let rules = {
+    username: [{required: true, message: '用户名不能为空', trigger: 'blur'}],
+    password: [{required: true, message: '密码不能为空', trigger: 'blur'}],
+}
+const updateVerifyCode = () => {
+    vcUrl.value = '/verifyCode?time='+new Date();
+};
+const submitLogin = (login) => {
+    login.validate((valid) => {
+        if (valid) {
+            loading.value = true;
+            var userJson = {};
+            userJson["name"] = loginForm.username;
+            userJson["password"] = loginForm.password;
+            axios
+                .post("/api/login", userJson)
+                .then(res => {
+                    let data = res.data;
+                    if(data.code == 0){
+                        //存储到state中
+                        setLogin({Authorization:data.data.uid, userName:data.data.account})
+                        setIndex('1');
+                        router.push('/home');
+                    }else{
+                        ElMessage({message:`登陆失败，${data.message}`, type:'error'})
+                        loading.value = false;
                     }
-                    else {
-                        return false;
-                    }
-                });
-            }
-
+                })
         }
-    }
+        else {
+            return false;
+        }
+    });
+}
 </script>
 <style scoped>
     .loginContainer {

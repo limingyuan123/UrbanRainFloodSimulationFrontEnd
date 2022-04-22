@@ -87,7 +87,7 @@
 </template>
 
 <script setup>
-import {mapMutations, useStore} from 'vuex'
+import {useStore} from 'vuex'
 import { ArrowDown } from '@element-plus/icons-vue'
 import {onMounted, ref, toRef} from 'vue';
 import {  useRouter} from 'vue-router'
