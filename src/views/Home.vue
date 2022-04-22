@@ -15,7 +15,7 @@
     <!-- 介绍部分的菜单 -->
     <div class="left_menu" id="left_menu">
       <li class="liContainer">
-        <strong class="menuFont">Getting Start</strong>
+        <strong class="menuFont">功能菜单</strong>
       </li>
       <li class="liContainer active">
         <a href="#" class="menuFont" @click="active($event)">Welcome</a>
@@ -134,80 +134,67 @@
     </div>
   </div>
 </template>
-<script>
+<script setup>
+import { onMounted, ref } from 'vue';
 import Navbar  from '../components/Navbar';
-export default {
-  name: "home",
-  components:{
-    Navbar,
-  },
-  data() {
-    return {
-      activeNavIndex: "1"
-    };
-  },
-  methods: {
-    active(event) {
-      console.log(event);
-      var text = event.path[1].innerText;
-      if (text === "Welcome") {
-        this.unactive();
-        var ele = document.getElementById("m2");
-        ele.setAttribute("class", "active");
-      } else if (text === "Describe") {
-        this.unactive();
-        var ele = document.getElementById("m3");
-        ele.setAttribute("class", "active");
-      } else if (text === "Mapping") {
-        this.unactive();
-        var ele = document.getElementById("m4");
-        ele.setAttribute("class", "active");
-      } else if (text === "Refactor") {
-        this.unactive();
-        var ele = document.getElementById("m5");
-        ele.setAttribute("class", "active");
-      } else if (text === "UDX Show") {
-        this.unactive();
-        var ele = document.getElementById("m7");
-        ele.setAttribute("class", "active");
-      } else if (text === "Operation") {
-        this.unactive();
-        var ele = document.getElementById("m8");
-        ele.setAttribute("class", "active");
-      }
-    },
-    unactive() {
-      var ele = document.getElementById("m2");
-      ele.setAttribute("class", "unactive");
-      var ele = document.getElementById("m3");
-      ele.setAttribute("class", "unactive");
-      var ele = document.getElementById("m4");
-      ele.setAttribute("class", "unactive");
-      var ele = document.getElementById("m5");
-      ele.setAttribute("class", "unactive");
-      var ele = document.getElementById("m7");
-      ele.setAttribute("class", "unactive");
-      var ele = document.getElementById("m8");
-      ele.setAttribute("class", "unactive");
-    }
-  },
-  mounted() {
-    //监听scroll事件,实现手写的sticky效果
-    window.addEventListener("scroll", () => {
-      var left_menu = document.getElementById("left_menu");
-      var right_menu = document.getElementById("right_menu");
-      if (right_menu.getBoundingClientRect().top <= 110) {
-        left_menu.style.position = "fixed";
-      } else if (right_menu.getBoundingClientRect().top > 110) {
-        left_menu.style.position = "relative";
-        // leftMenu.style.top = leftMenu.getBoundingClientRect().top +"px";
-      }
-      // console.log(right_menu.getBoundingClientRect().top);
-    });
-
-    window.addEventListener("", ()=>{
-
-    })
+let activeNavIndex = ref("1");
+const active = (event) => {
+  console.log(event);
+  let text = event.path[1].innerText;
+  if (text === "Welcome") {
+    unactive();
+    let ele = document.getElementById("m2");
+    ele.setAttribute("class", "active");
+  } else if (text === "Describe") {
+    unactive();
+    let ele = document.getElementById("m3");
+    ele.setAttribute("class", "active");
+  } else if (text === "Mapping") {
+    unactive();
+    let ele = document.getElementById("m4");
+    ele.setAttribute("class", "active");
+  } else if (text === "Refactor") {
+    unactive();
+    let ele = document.getElementById("m5");
+    ele.setAttribute("class", "active");
+  } else if (text === "UDX Show") {
+    unactive();
+    let ele = document.getElementById("m7");
+    ele.setAttribute("class", "active");
+  } else if (text === "Operation") {
+    unactive();
+    let ele = document.getElementById("m8");
+    ele.setAttribute("class", "active");
   }
 };
+const unactive = () => {
+  let ele = document.getElementById("m2");
+  ele.setAttribute("class", "unactive");
+  ele = document.getElementById("m3");
+  ele.setAttribute("class", "unactive");
+  ele = document.getElementById("m4");
+  ele.setAttribute("class", "unactive");
+  ele = document.getElementById("m5");
+  ele.setAttribute("class", "unactive");
+  ele = document.getElementById("m7");
+  ele.setAttribute("class", "unactive");
+  ele = document.getElementById("m8");
+  ele.setAttribute("class", "unactive");
+}
+onMounted(() => {
+  //监听scroll事件,实现手写的sticky效果
+  window.addEventListener("scroll", () => {
+    var left_menu = document.getElementById("left_menu");
+    var right_menu = document.getElementById("right_menu");
+    if (right_menu.getBoundingClientRect().top <= 110) {
+      left_menu.style.position = "fixed";
+    } else if (right_menu.getBoundingClientRect().top > 110) {
+      left_menu.style.position = "relative";
+    }
+  });
+
+  window.addEventListener("", ()=>{
+
+  })
+})
 </script>

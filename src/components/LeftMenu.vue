@@ -5,14 +5,7 @@
   </div>
 </template>
 
-<script>
-export default {
-  name:'LeftMenu',
-  data () {
-    return {
-    }
-  }
-}
+<script setup>
 </script>
 
 <style scoped>
