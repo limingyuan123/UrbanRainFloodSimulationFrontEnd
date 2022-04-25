@@ -29,4 +29,29 @@ module.exports = {
         },
       } 
     },
+    // configureWebpack:(config) => {
+    //   let plugins = [];
+    //   // if(process.env.NODE_ENV === 'production'){
+
+    //   // }
+    //   return {
+    //     module:{
+    //       unknownContextCritical:false,
+    //       rules:[
+    //         {
+    //           test: /\.tsx?$/,
+    //           loader: 'ts-loader',
+    //           options: {
+    //             appendTsSuffixTo: [/\.vue$/],
+    //           },
+    //           exclude: /node_modules/,
+    //         },
+    //         {
+    //           test: /\.vue$/,
+    //           loader: 'vue-loader',
+    //         }
+    //       ]
+    //     }
+    //   }
+    // }
 }

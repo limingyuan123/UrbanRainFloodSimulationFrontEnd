@@ -10,26 +10,11 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import LeftMenu from '../components/LeftMenu'
 import Navbar  from '../components/Navbar'
 import Lisflood from '../components/LISFLOOD-FP'
 import Swmm from '../components/SWMM'
-export default {
-  name:'Couple',
-  components: {
-    Navbar,
-    Swmm,
-    Lisflood,
-    LeftMenu,
-  },
-
-  data () {
-    return {
-
-    }
-  }
-}
 </script>
 
 <style scoped>
