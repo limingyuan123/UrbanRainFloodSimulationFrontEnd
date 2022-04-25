@@ -94,8 +94,6 @@ import {  useRouter} from 'vue-router'
 const router = useRouter();
 const store = useStore();
 let activeNavIndex = ref("1");
-const {setLogin:[setLogin]} = store._mutations;
-const {setIndex:[setIndex]} = store._mutations;
 const handleOpen = (key, keyPath)  => {
   console.log(key, keyPath);
 };
@@ -106,15 +104,15 @@ const handleSelect = (key, keyPath)  => {
   console.log(key, keyPath);
 };
 const toHome = ()  => {
-  setIndex('1');      
+  store.commit('setIndex', '1');   
   router.push('/home')
 };
 const turnToLogin = ()  => {
-  setIndex('');
+  store.commit('setIndex', '');
   router.push('/login')
 };
 const turnToSign = ()  => {
-  setIndex('');
+  store.commit('setIndex', '');
   router.push('/register')
 };
 const turnToTemplate = ()  => {
@@ -130,15 +128,15 @@ const turnToHelp = () => {
   alert("hello im help sir");
 };
 const toOperation = () => {      
-  setIndex('2');
+  store.commit('setIndex', '2');
   router.push('/operation')
 };
 const toShow = () => {
-  setIndex('3');
+  store.commit('setIndex', '3');
   router.push('/couple')
 };
 const logOut = () => {
-  setLogin({Authorization:'', userName:''});
+  store.commit('setLogin', {Authorization:'', userName:''});
 }
 onMounted(() => {
   activeNavIndex.value = store.state.index;

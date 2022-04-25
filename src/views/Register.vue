@@ -46,12 +46,8 @@ import Navbar  from '../components/Navbar'
 import { Back } from '@element-plus/icons-vue'
 import { reactive, ref,toRefs } from 'vue';
 import {useRouter} from 'vue-router'
-import { useStore } from 'vuex';
 import axios from 'axios';
 const router = useRouter();
-const store = useStore();
-const {setLogin:[setLogin]} = store._mutations;
-const {setIndex:[setIndex]} = store._mutations;
 let loading = ref(false);
 let vcUrl = ref('/verifyCode?time='+new Date());
 let checked = ref(true);

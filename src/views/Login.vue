@@ -42,8 +42,6 @@ import axios from 'axios';
 import { ElMessage } from 'element-plus/lib/components';
 import { FormInstance } from 'element-plus';
 const store = useStore();
-const {setLogin:[setLogin]} = store._mutations;
-const {setIndex:[setIndex]} = store._mutations;
 const router = useRouter();
 let loading = ref(false);
 let formRef = ref();
@@ -75,8 +73,8 @@ const submitLogin = (login) => {
                     let data = res.data;
                     if(data.code == 0){
                         //存储到state中
-                        setLogin({Authorization:data.data.uid, userName:data.data.account})
-                        setIndex('1');
+                        store.commit('setLogin', {Authorization:data.data.uid, userName:data.data.account});
+                        store.commit('setIndex', '1');
                         router.push('/home');
                     }else{
                         ElMessage({message:`登陆失败，${data.message}`, type:'error'})
