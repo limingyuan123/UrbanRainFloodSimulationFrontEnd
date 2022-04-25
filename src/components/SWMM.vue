@@ -1,93 +1,98 @@
 <!-- mapbox -->
 <template>
-  <div class="tool">
+  <div
+    class="tool"
+    style="
+      margin-left: 10px;
+      margin-top: 10px;
+      border-radius: 15px;
+      opacity: 0.8;
+    "
+  >
     <el-tabs
       v-model="activeName"
       @tab-click="handleClick"
       type="card"
       style="height: 100%"
       stretch
+      id="tab"
     >
-      <el-tab-pane label="管网图" name="first">
+      <el-tab-pane label="管网图" name="first" style="height: 100%">
+        <el-tabs
+          tab-position="left"
+          style="height: 100%"
+          @tab-click="handleClick"
+          stretch
+        >
+          <el-tab-pane label="72mm" name="quo_5">
+            <el-select
+              v-model="NT_showInPop"
+              placeholder=""
+              @change="selectChange"
+            >
+              <el-option
+                v-for="item in NodePopType"
+                :key="item"
+                :label="item.value"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-tab-pane>
+          <el-tab-pane label="89mm" name="quo_10">
+            <el-button class="file" style="background: #d4d7d8; margin: 5px">
+              <h2 style="margin: 5px">89mm</h2>
+            </el-button>
+          </el-tab-pane>
+          <el-tab-pane label="104mm" name="quo_20">
+            <el-button class="file" style="background: #d4d7d8; margin: 5px">
+              <h2 style="margin: 5px">104mm</h2>
+              <p></p>
+            </el-button>
+          </el-tab-pane>
+          <el-tab-pane label="112mm" name="quo_30">
+            <el-button class="file" style="background: #d4d7d8; margin: 5px">
+              <h2 style="margin: 5px">112mm</h2>
+            </el-button>
+          </el-tab-pane>
+          <el-tab-pane label="121mm" name="quo_50">
+            <el-button class="file" style="background: #d4d7d8; margin: 5px">
+              <h2 style="margin: 5px">121mm</h2>
+            </el-button>
+          </el-tab-pane>
+        </el-tabs>
+
         <!-- File -->
-        <div class="detail">
-          <!-- <p>You can perform a series of file operations, including loading project files, importing configuration files, and saving result files</p> -->
-          <p>选择不同的降水类型，展示不同的模拟结果</p>
-        </div>
-        <el-button
-          class="file"
-          style="background: #d4d7d8; margin: 5px"
-          @click="openFileDialog('/quo_5.disp', '/quo2.geojson')"
-        >
-          <h2 style="margin: 5px">五年一遇降水</h2>
-          <p>选择该降水数据，展示模拟结果</p>
-        </el-button>
-        <el-button
-          class="file"
-          style="background: #d4d7d8; margin: 5px"
-          @click="openFileDialog('/quo_10.disp', '/quo2.geojson')"
-        >
-          <h2 style="margin: 5px">十年一遇降水</h2>
-          <p>选择该降水数据，展示模拟结果</p>
-        </el-button>
-        <el-button
-          class="file"
-          style="background: #d4d7d8; margin: 5px"
-          @click="openFileDialog('/quo_20.disp', '/quo2.geojson')"
-        >
-          <h2 style="margin: 5px">二十年一遇降水</h2>
-          <p>选择该降水数据，展示模拟结果</p>
-        </el-button>
-        <el-button
-          class="file"
-          style="background: #d4d7d8; margin: 5px"
-          @click="openFileDialog('/quo_30.disp', '/quo2.geojson')"
-        >
-          <h2 style="margin: 5px">三十年一遇降水</h2>
-          <p>选择该降水数据，展示模拟结果</p>
-        </el-button>
-        <el-button
-          class="file"
-          style="background: #d4d7d8; margin: 5px"
-          @click="openFileDialog('/quo_50.disp', '/quo2.geojson')"
-        >
-          <h2 style="margin: 5px">五十年一遇降水</h2>
-          <p>选择该降水数据，展示模拟结果</p>
-        </el-button>
       </el-tab-pane>
       <el-tab-pane label="流向图" name="second">Operation</el-tab-pane>
       <!-- <el-tab-pane label="Simulation" name="third">Simulation</el-tab-pane>
         <el-tab-pane label="Coupling analysis" name="fourth">Coupling analysis</el-tab-pane> -->
     </el-tabs>
+    <div
+      id="time-slider"
+      style="background: white; border-radius: 15px; width: 100%; bottom: -20%"
+    >
+      <el-slider
+        v-model="timeSlider"
+        @change="sliderChange"
+        :step="1"
+        :min="1"
+        :max="maxSlider"
+        :marks="marks"
+        :format-tooltip="formatTooltip"
+        style="width: 80%; margin: auto"
+      >
+      </el-slider>
+      <el-button size="small" round @click="startAnimation" :disabled="startBtn"
+        >Start</el-button
+      >
+      <el-button size="small" round @click="pauseAnimation" :disabled="pauseBtn"
+        >Pause</el-button
+      >
+    </div>
   </div>
+
   <div id="map"></div>
-
-  <div id="time-slider">
-    <el-slider
-      v-model="timeSlider"
-      @change="sliderChange"
-      :step="1"
-      :min="1"
-      :max="maxSlider"
-      :marks="marks"
-      :format-tooltip="formatTooltip"
-      style="width: 80%; margin: auto"
-    >
-    </el-slider>
-    <el-button
-      size="small"
-      round
-      @click="startAnimation"
-      :disabled="startBtn"
-      style="margin-bottom: 5px"
-      >Start</el-button
-    >
-    <el-button size="small" round @click="pauseAnimation" :disabled="pauseBtn"
-      >Pause</el-button
-    >
-  </div>
 </template>
-
 <script>
 //样式引入
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -95,10 +100,15 @@ import "mapbox-gl";
 import * as echarts from "echarts";
 //定义变量使用
 const mapboxgl = require("mapbox-gl");
+var Ppop = "";
+var Lpop = "";
 export default {
   name: "SWMM",
   data() {
     return {
+      echar: "",
+      NT_showInPop: "",
+      LT_showInPop: "",
       rptResult: {},
       isCollapse: true,
       fileDialog: false,
@@ -155,6 +165,13 @@ export default {
       curDateIndex: 0,
       curYear: "5year",
       conduitStartBtn: true,
+      NodePopType: [
+        { value: "Inflow" },
+        { value: "Flooding" },
+        { value: "Depth" },
+        { value: "Head" },
+      ],
+      LinkPopType: ["Flow", "Velocity", "Depth", "Capacity"],
     };
   },
   components: {},
@@ -184,6 +201,13 @@ export default {
     handleClose(key, keyPath) {
       console.log(key, keyPath);
     },
+    selectChange(value) {
+      let _this = this;
+      _this.SetPop(_this, _this.layerNumber - 1);
+    },
+    handleClick(tab, event) {
+      this.openFileDialog(tab.props.name + ".disp", "quo.geojson");
+    },
     getrptResult(e, url) {
       return new Promise((resolve, reject) => {
         e.axios
@@ -209,8 +233,8 @@ export default {
       });
     },
     initEchart(x, y, id, chart_name) {
-      echarts.init(document.getElementById(id)).dispose();
-      var echar = echarts.init(document.getElementById(id));
+      //this.echar = echarts.init(document.getElementById(id));
+      this.echar = echarts.init(document.getElementById(id));
       let data = y;
       let date = x;
       // 指定图表的配置项和数据
@@ -222,7 +246,7 @@ export default {
           data: [chart_name],
         },
         grid: {
-          left: "3%",
+          left: "10%",
           right: "4%",
           bottom: "3%",
           containLabel: true,
@@ -235,7 +259,6 @@ export default {
         },
         xAxis: {
           type: "category",
-          boundaryGap: false,
           data: date,
         },
         yAxis: {
@@ -250,8 +273,8 @@ export default {
           },
         ],
       };
-      echar.clear();
-      echar.setOption(option1);
+      this.echar.clear();
+      this.echar.setOption(option1);
     },
     openFileDialog(disp_url, geo_url) {
       let f = this.getrptResult(this, disp_url);
@@ -424,95 +447,7 @@ export default {
           },
           filter: ["in", "$type", "Point"],
         });
-        _this.map.on(
-          "mouseenter",
-          "vectorLayer" + _this.layerNumber + "point",
-          function () {
-            _this.map.getCanvas().style.cursor = "pointer";
-          }
-        );
-        _this.map.on(
-          "mouseleave",
-          "vectorLayer" + _this.layerNumber + "point",
-          function () {
-            _this.map.getCanvas().style.cursor = "";
-          }
-        );
-        _this.map.on(
-          "mouseenter",
-          "vectorLayer" + _this.layerNumber + "line",
-          function () {
-            _this.map.getCanvas().style.cursor = "pointer";
-          }
-        );
-        _this.map.on(
-          "mouseleave",
-          "vectorLayer" + _this.layerNumber + "line",
-          function () {
-            _this.map.getCanvas().style.cursor = "";
-          }
-        );
-        _this.map.on(
-          "click",
-          "vectorLayer" + _this.layerNumber + "point",
-          (e) => {
-            e.preventDefault();
-            // Copy coordinates array.
-            const coordinates = e.features[0].geometry.coordinates.slice();
-            // Ensure that if the map is zoomed out such that multiple
-            // copies of the feature are visible, the popup appears
-            // over the copy being pointed to.
-            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-              coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-            }
-            let y = _this.options[0].children
-              .find((child) => child.label == e.features[0].properties.name)
-              .children.find((Flooding) => Flooding.value == "Flooding").data;
-            let x = _this.rptResult.Date;
-            new mapboxgl.Popup({ maxWidth: "800px" })
-              .setLngLat(e.lngLat)
-              .setHTML(
-                "<div id=" +
-                  "e_chart_P" +
-                  " style='height:400px;width:600px;'></div>"
-              )
-              .addTo(_this.map);
-            setTimeout(() => {
-              _this.initEchart(x, y, "e_chart_P", "Flooding");
-            }, 1);
-          }
-        );
-        _this.map.on(
-          "click",
-          "vectorLayer" + _this.layerNumber + "line",
-          (e) => {
-            if (e.defaultPrevented) {
-            } else {
-              // Copy coordinates array.
-              const coordinates = e.features[0].geometry.coordinates.slice();
-              // Ensure that if the map is zoomed out such that multiple
-              // copies of the feature are visible, the popup appears
-              // over the copy being pointed to.
-              while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-              }
-
-              let y = _this.options[1].children
-                .find((child) => child.label == e.features[0].properties.name)
-                .children.find((Flooding) => Flooding.value == "Depth").data;
-              let x = _this.rptResult.Date;
-              new mapboxgl.Popup({ maxWidth: "800px" })
-                .setLngLat(e.lngLat)
-                .setHTML(
-                  "<div id='e_chart' style='height:400px;width:600px;'></div>"
-                )
-                .addTo(_this.map);
-              setTimeout(() => {
-                _this.initEchart(x, y, "e_chart", "Depth");
-              }, 1);
-            }
-          }
-        );
+        //_this.SetPop(_this);
         _this.layerNumber++;
 
         // slider
@@ -526,7 +461,96 @@ export default {
         _this.conduitStartBtn = false;
       });
     },
+    Npopclick(e) {
+      e.preventDefault();
+      // Copy coordinates array.
+      const coordinates = e.features[0].geometry.coordinates.slice();
+      // Ensure that if the map is zoomed out such that multiple
+      // copies of the feature are visible, the popup appears
+      // over the copy being pointed to.
+      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      }
+      let y = this.options[0].children
+        .find((child) => child.label == e.features[0].properties.name)
+        .children.find((Flooding) => Flooding.value == this.NT_showInPop).data;
+      let x = this.rptResult.Date;
+      Ppop = new mapboxgl.Popup({ className: "Point_pop", maxWidth: "800px" })
+        .setLngLat(e.lngLat)
+        .setHTML(
+          "<div id=" + "e_chart_P" + " style='height:400px;width:600px;'></div>"
+        )
+        .addTo(this.map);
+      setTimeout(() => {
+        this.initEchart(x, y, "e_chart_P", this.NT_showInPop);
+      }, 1);
+    },
+    LPopclick(e) {
+      if (e.defaultPrevented) {
+      } else {
+        // Copy coordinates array.
+        const coordinates = e.features[0].geometry.coordinates.slice();
+        // Ensure that if the map is zoomed out such that multiple
+        // copies of the feature are visible, the popup appears
+        // over the copy being pointed to.
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+        }
 
+        let y = this.options[1].children
+          .find((child) => child.label == e.features[0].properties.name)
+          .children.find((Flooding) => Flooding.value == "Depth").data;
+        let x = this.rptResult.Date;
+        Lpop = new mapboxgl.Popup({ maxWidth: "800px" })
+          .setLngLat(e.lngLat)
+          .setHTML(
+            "<div id='e_chart_L' style='height:400px;width:600px;'></div>"
+          )
+          .addTo(this.map);
+        setTimeout(() => {
+          this.initEchart(x, y, "e_chart_L", "Depth");
+        }, 1);
+      }
+    },
+    menter(e) {
+      this.map.getCanvas().style.cursor = "pointer";
+    },
+    mleave(e) {
+      this.map.getCanvas().style.cursor = "";
+    },
+    SetPop(_this, layerN) {
+      if (Ppop != "") {
+        Ppop.remove();
+        _this.map.off(
+          "click",
+          "vectorLayer" + layerN + "point",
+          _this.Npopclick
+        );
+      }
+      if(Lpop!=""){
+        Lpop.remove();
+        _this.map.off(
+          "click",
+          "vectorLayer" + layerN + "line",
+          _this.LPopclick
+        );
+      }
+
+      _this.map.on(
+        "mouseenter",
+        "vectorLayer" + layerN + "point",
+        _this.menter
+      );
+      _this.map.on(
+        "mouseleave",
+        "vectorLayer" + layerN + "point",
+        _this.mleave
+      );
+      _this.map.on("mouseenter", "vectorLayer" + layerN + "line", _this.menter);
+      _this.map.on("mouseleave", "vectorLayer" + layerN + "line", _this.mleave);
+      _this.map.on("click", "vectorLayer" + layerN + "point", _this.Npopclick);
+      _this.map.on("click", "vectorLayer" + layerN + "line", _this.LPopclick);
+    },
     changeChooseMap(e) {
       // 还原slider
       e.numberAnima = 0;
@@ -602,7 +626,6 @@ export default {
       e.map.setCenter({ lng: 120.845, lat: 31.037 });
       e.sliderChange(1);
     },
-    handleClick() {},
     confirmLoad() {},
     selectFile() {
       $("#uploadFile").click();
@@ -710,9 +733,21 @@ export default {
 </script>
 
 <style>
+.el-tabs__content {
+  height: 80%;
+}
+.el-tabs__nav.is-left {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+.el-tabs__item.is-left {
+  flex: 1;
+}
 #map {
   height: calc(100vh - 120px);
 }
+
 .mapboxgl-popup {
   max-width: 800px;
   font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
@@ -727,13 +762,18 @@ export default {
 }
 .tool {
   background: white;
-  height: calc(100vh - 120px);
+  height: 60%;
   width: 30%;
   position: absolute;
   /* top: 40%; */
   z-index: 1000;
-  left: 0%;
+  /* left: 0%; */
+  margin-left: 10px;
+  margin-top: 10px;
+  border-radius: 15px;
+  opacity: 0.8;
 }
+
 #time-slider {
   text-align: center;
   z-index: 10000;
