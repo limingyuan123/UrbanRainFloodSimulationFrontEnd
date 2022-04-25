@@ -25,9 +25,18 @@
           stretch
         >
           <el-tab-pane label="72mm" name="quo_5">
-            <el-button class="file" style="background: #d4d7d8; margin: 5px">
-              <h2 style="margin: 5px">72mm</h2>
-            </el-button>
+            <el-select
+              v-model="NT_showInPop"
+              placeholder=""
+              @change="selectChange"
+            >
+              <el-option
+                v-for="item in NodePopType"
+                :key="item"
+                :label="item.value"
+                :value="item.value"
+              ></el-option>
+            </el-select>
           </el-tab-pane>
           <el-tab-pane label="89mm" name="quo_10">
             <el-button class="file" style="background: #d4d7d8; margin: 5px">
@@ -91,10 +100,15 @@ import "mapbox-gl";
 import * as echarts from "echarts";
 //定义变量使用
 const mapboxgl = require("mapbox-gl");
+var Ppop = "";
+var Lpop = "";
 export default {
   name: "SWMM",
   data() {
     return {
+      echar: "",
+      NT_showInPop: "",
+      LT_showInPop: "",
       rptResult: {},
       isCollapse: true,
       fileDialog: false,
@@ -151,6 +165,13 @@ export default {
       curDateIndex: 0,
       curYear: "5year",
       conduitStartBtn: true,
+      NodePopType: [
+        { value: "Inflow" },
+        { value: "Flooding" },
+        { value: "Depth" },
+        { value: "Head" },
+      ],
+      LinkPopType: ["Flow", "Velocity", "Depth", "Capacity"],
     };
   },
   components: {},
@@ -180,8 +201,11 @@ export default {
     handleClose(key, keyPath) {
       console.log(key, keyPath);
     },
+    selectChange(value) {
+      let _this = this;
+      _this.SetPop(_this, _this.layerNumber - 1);
+    },
     handleClick(tab, event) {
-      console.log(tab.props.name, event);
       this.openFileDialog(tab.props.name + ".disp", "quo.geojson");
     },
     getrptResult(e, url) {
@@ -209,8 +233,8 @@ export default {
       });
     },
     initEchart(x, y, id, chart_name) {
-      echarts.init(document.getElementById(id)).dispose();
-      var echar = echarts.init(document.getElementById(id));
+      //this.echar = echarts.init(document.getElementById(id));
+      this.echar = echarts.init(document.getElementById(id));
       let data = y;
       let date = x;
       // 指定图表的配置项和数据
@@ -249,8 +273,8 @@ export default {
           },
         ],
       };
-      echar.clear();
-      echar.setOption(option1);
+      this.echar.clear();
+      this.echar.setOption(option1);
     },
     openFileDialog(disp_url, geo_url) {
       let f = this.getrptResult(this, disp_url);
@@ -423,95 +447,7 @@ export default {
           },
           filter: ["in", "$type", "Point"],
         });
-        _this.map.on(
-          "mouseenter",
-          "vectorLayer" + _this.layerNumber + "point",
-          function () {
-            _this.map.getCanvas().style.cursor = "pointer";
-          }
-        );
-        _this.map.on(
-          "mouseleave",
-          "vectorLayer" + _this.layerNumber + "point",
-          function () {
-            _this.map.getCanvas().style.cursor = "";
-          }
-        );
-        _this.map.on(
-          "mouseenter",
-          "vectorLayer" + _this.layerNumber + "line",
-          function () {
-            _this.map.getCanvas().style.cursor = "pointer";
-          }
-        );
-        _this.map.on(
-          "mouseleave",
-          "vectorLayer" + _this.layerNumber + "line",
-          function () {
-            _this.map.getCanvas().style.cursor = "";
-          }
-        );
-        _this.map.on(
-          "click",
-          "vectorLayer" + _this.layerNumber + "point",
-          (e) => {
-            e.preventDefault();
-            // Copy coordinates array.
-            const coordinates = e.features[0].geometry.coordinates.slice();
-            // Ensure that if the map is zoomed out such that multiple
-            // copies of the feature are visible, the popup appears
-            // over the copy being pointed to.
-            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-              coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-            }
-            let y = _this.options[0].children
-              .find((child) => child.label == e.features[0].properties.name)
-              .children.find((Flooding) => Flooding.value == "Flooding").data;
-            let x = _this.rptResult.Date;
-            new mapboxgl.Popup({ maxWidth: "800px" })
-              .setLngLat(e.lngLat)
-              .setHTML(
-                "<div id=" +
-                  "e_chart_P" +
-                  " style='height:400px;width:600px;'></div>"
-              )
-              .addTo(_this.map);
-            setTimeout(() => {
-              _this.initEchart(x, y, "e_chart_P", "Flooding");
-            }, 1);
-          }
-        );
-        _this.map.on(
-          "click",
-          "vectorLayer" + _this.layerNumber + "line",
-          (e) => {
-            if (e.defaultPrevented) {
-            } else {
-              // Copy coordinates array.
-              const coordinates = e.features[0].geometry.coordinates.slice();
-              // Ensure that if the map is zoomed out such that multiple
-              // copies of the feature are visible, the popup appears
-              // over the copy being pointed to.
-              while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-              }
-
-              let y = _this.options[1].children
-                .find((child) => child.label == e.features[0].properties.name)
-                .children.find((Flooding) => Flooding.value == "Depth").data;
-              let x = _this.rptResult.Date;
-              new mapboxgl.Popup({ maxWidth: "800px" })
-                .setLngLat(e.lngLat)
-                .setHTML(
-                  "<div id='e_chart' style='height:400px;width:600px;'></div>"
-                )
-                .addTo(_this.map);
-              setTimeout(() => {
-                _this.initEchart(x, y, "e_chart", "Depth");
-              }, 1);
-            }
-          }
-        );
+        //_this.SetPop(_this);
         _this.layerNumber++;
 
         // slider
@@ -525,7 +461,96 @@ export default {
         _this.conduitStartBtn = false;
       });
     },
+    Npopclick(e) {
+      e.preventDefault();
+      // Copy coordinates array.
+      const coordinates = e.features[0].geometry.coordinates.slice();
+      // Ensure that if the map is zoomed out such that multiple
+      // copies of the feature are visible, the popup appears
+      // over the copy being pointed to.
+      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      }
+      let y = this.options[0].children
+        .find((child) => child.label == e.features[0].properties.name)
+        .children.find((Flooding) => Flooding.value == this.NT_showInPop).data;
+      let x = this.rptResult.Date;
+      Ppop = new mapboxgl.Popup({ className: "Point_pop", maxWidth: "800px" })
+        .setLngLat(e.lngLat)
+        .setHTML(
+          "<div id=" + "e_chart_P" + " style='height:400px;width:600px;'></div>"
+        )
+        .addTo(this.map);
+      setTimeout(() => {
+        this.initEchart(x, y, "e_chart_P", this.NT_showInPop);
+      }, 1);
+    },
+    LPopclick(e) {
+      if (e.defaultPrevented) {
+      } else {
+        // Copy coordinates array.
+        const coordinates = e.features[0].geometry.coordinates.slice();
+        // Ensure that if the map is zoomed out such that multiple
+        // copies of the feature are visible, the popup appears
+        // over the copy being pointed to.
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+        }
 
+        let y = this.options[1].children
+          .find((child) => child.label == e.features[0].properties.name)
+          .children.find((Flooding) => Flooding.value == "Depth").data;
+        let x = this.rptResult.Date;
+        Lpop = new mapboxgl.Popup({ maxWidth: "800px" })
+          .setLngLat(e.lngLat)
+          .setHTML(
+            "<div id='e_chart_L' style='height:400px;width:600px;'></div>"
+          )
+          .addTo(this.map);
+        setTimeout(() => {
+          this.initEchart(x, y, "e_chart_L", "Depth");
+        }, 1);
+      }
+    },
+    menter(e) {
+      this.map.getCanvas().style.cursor = "pointer";
+    },
+    mleave(e) {
+      this.map.getCanvas().style.cursor = "";
+    },
+    SetPop(_this, layerN) {
+      if (Ppop != "") {
+        Ppop.remove();
+        _this.map.off(
+          "click",
+          "vectorLayer" + layerN + "point",
+          _this.Npopclick
+        );
+      }
+      if(Lpop!=""){
+        Lpop.remove();
+        _this.map.off(
+          "click",
+          "vectorLayer" + layerN + "line",
+          _this.LPopclick
+        );
+      }
+
+      _this.map.on(
+        "mouseenter",
+        "vectorLayer" + layerN + "point",
+        _this.menter
+      );
+      _this.map.on(
+        "mouseleave",
+        "vectorLayer" + layerN + "point",
+        _this.mleave
+      );
+      _this.map.on("mouseenter", "vectorLayer" + layerN + "line", _this.menter);
+      _this.map.on("mouseleave", "vectorLayer" + layerN + "line", _this.mleave);
+      _this.map.on("click", "vectorLayer" + layerN + "point", _this.Npopclick);
+      _this.map.on("click", "vectorLayer" + layerN + "line", _this.LPopclick);
+    },
     changeChooseMap(e) {
       // 还原slider
       e.numberAnima = 0;
@@ -713,11 +738,11 @@ export default {
 }
 .el-tabs__nav.is-left {
   display: flex;
-	flex-flow: column;
+  flex-flow: column;
   height: 100%;
 }
 .el-tabs__item.is-left {
-  flex: 1
+  flex: 1;
 }
 #map {
   height: calc(100vh - 120px);
