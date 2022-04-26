@@ -19,45 +19,151 @@
     >
       <el-tab-pane label="管网图" name="first" style="height: 100%">
         <el-tabs
+          v-loading="loading"
           tab-position="left"
           style="height: 100%"
           @tab-click="handleClick"
           stretch
         >
           <el-tab-pane label="72mm" name="quo_5">
-            <el-select
-              v-model="NT_showInPop"
-              placeholder=""
-              @change="selectChange"
-            >
-              <el-option
-                v-for="item in NodePopType"
-                :key="item"
-                :label="item.value"
-                :value="item.value"
-              ></el-option>
-            </el-select>
+            <div class="select">
+              <el-select
+                v-model="NT_showInPop"
+                placeholder=""
+                @change="selectChange"
+              >
+                <el-option
+                  v-for="item in NodePopType"
+                  :key="item"
+                  :label="item.value"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+              <el-select
+                v-model="LT_showInPop"
+                placeholder=""
+                @change="selectChange"
+              >
+                <el-option
+                  v-for="item in LinkPopType"
+                  :key="item"
+                  :label="item.value"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </div>
           </el-tab-pane>
           <el-tab-pane label="89mm" name="quo_10">
-            <el-button class="file" style="background: #d4d7d8; margin: 5px">
-              <h2 style="margin: 5px">89mm</h2>
-            </el-button>
+            <div class="select">
+              <el-select
+                v-model="NT_showInPop"
+                placeholder=""
+                @change="selectChange"
+              >
+                <el-option
+                  v-for="item in NodePopType"
+                  :key="item"
+                  :label="item.value"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+              <el-select
+                v-model="LT_showInPop"
+                placeholder=""
+                @change="selectChange"
+              >
+                <el-option
+                  v-for="item in LinkPopType"
+                  :key="item"
+                  :label="item.value"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </div>
           </el-tab-pane>
           <el-tab-pane label="104mm" name="quo_20">
-            <el-button class="file" style="background: #d4d7d8; margin: 5px">
-              <h2 style="margin: 5px">104mm</h2>
-              <p></p>
-            </el-button>
+            <div class="select">
+              <el-select
+                v-model="NT_showInPop"
+                placeholder=""
+                @change="selectChange"
+              >
+                <el-option
+                  v-for="item in NodePopType"
+                  :key="item"
+                  :label="item.value"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+              <el-select
+                v-model="LT_showInPop"
+                placeholder=""
+                @change="selectChange"
+              >
+                <el-option
+                  v-for="item in LinkPopType"
+                  :key="item"
+                  :label="item.value"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </div>
           </el-tab-pane>
           <el-tab-pane label="112mm" name="quo_30">
-            <el-button class="file" style="background: #d4d7d8; margin: 5px">
-              <h2 style="margin: 5px">112mm</h2>
-            </el-button>
+            <div class="select">
+              <el-select
+                v-model="NT_showInPop"
+                placeholder=""
+                @change="selectChange"
+              >
+                <el-option
+                  v-for="item in NodePopType"
+                  :key="item"
+                  :label="item.value"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+              <el-select
+                v-model="LT_showInPop"
+                placeholder=""
+                @change="selectChange"
+              >
+                <el-option
+                  v-for="item in LinkPopType"
+                  :key="item"
+                  :label="item.value"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </div>
           </el-tab-pane>
           <el-tab-pane label="121mm" name="quo_50">
-            <el-button class="file" style="background: #d4d7d8; margin: 5px">
-              <h2 style="margin: 5px">121mm</h2>
-            </el-button>
+            <div class="select">
+              <el-select
+                v-model="NT_showInPop"
+                placeholder=""
+                @change="selectChange"
+              >
+                <el-option
+                  v-for="item in NodePopType"
+                  :key="item"
+                  :label="item.value"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+              <el-select
+                v-model="LT_showInPop"
+                placeholder=""
+                @change="selectChange"
+              >
+                <el-option
+                  v-for="item in LinkPopType"
+                  :key="item"
+                  :label="item.value"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </div>
           </el-tab-pane>
         </el-tabs>
 
@@ -90,7 +196,6 @@
       >
     </div>
   </div>
-
   <div id="map"></div>
 </template>
 <script>
@@ -100,23 +205,20 @@ import "mapbox-gl";
 import * as echarts from "echarts";
 //定义变量使用
 const mapboxgl = require("mapbox-gl");
-var Ppop = "";
-var Lpop = "";
 export default {
   name: "SWMM",
   data() {
     return {
       echar: "",
-      NT_showInPop: "",
-      LT_showInPop: "",
+      loading: true,
+      NT_showInPop: "Inflow",
+      LT_showInPop: "Flow",
       rptResult: {},
       isCollapse: true,
       fileDialog: false,
       loading: false,
       uploadFiles: [],
       propertySelectVisible: false,
-      nodeRadio: 1,
-      linkRadio: 2,
       selData: [],
       selTitle: "",
       geojson: "",
@@ -171,7 +273,12 @@ export default {
         { value: "Depth" },
         { value: "Head" },
       ],
-      LinkPopType: ["Flow", "Velocity", "Depth", "Capacity"],
+      LinkPopType: [
+        { value: "Flow" },
+        { value: "Velocity" },
+        { value: "Depth" },
+        { value: "Capacity" },
+      ],
     };
   },
   components: {},
@@ -202,8 +309,7 @@ export default {
       console.log(key, keyPath);
     },
     selectChange(value) {
-      let _this = this;
-      _this.SetPop(_this, _this.layerNumber - 1);
+      this.SetPop(this.layerNumber - 1);
     },
     handleClick(tab, event) {
       this.openFileDialog(tab.props.name + ".disp", "quo.geojson");
@@ -277,189 +383,208 @@ export default {
       this.echar.setOption(option1);
     },
     openFileDialog(disp_url, geo_url) {
+      this.loading = true;
       let f = this.getrptResult(this, disp_url);
       let ff = this.getGeojson(this, geo_url);
       let _this = this;
 
-      Promise.all([f, ff]).then((array) => {
-        _this.rptResult = array[0];
-        _this.geojsonObject = array[1];
-        _this.options = [
-          {
-            value: "node",
-            label: "Node Results",
-            children: [],
-          },
-          {
-            value: "link",
-            label: "Link Results",
-            children: [],
-          },
-        ];
-        // chart Tab
-        for (let i = 0; i < _this.rptResult.Node.length; i++) {
-          let node = _this.rptResult.Node[i];
-          let nodeResult = _this.rptResult.NodeResults[i];
-          let child = {
-            value: node.toLowerCase(),
-            label: node,
-            children: [
-              {
-                value: "Inflow",
-                label: "入流量(m³/s)",
-                data: nodeResult.Inflow,
-              },
-              {
-                value: "Flooding",
-                label: "管点溢流(m³/s)",
-                data: nodeResult.Flooding,
-              },
-              {
-                value: "Depth",
-                label: "管点深度(m)",
-                data: nodeResult.Depth,
-              },
-              {
-                value: "Head",
-                label: "管点水头(m)",
-                data: nodeResult.Head,
-              },
-            ],
-          };
-          _this.options[0].children.push(child);
-        }
-        for (let j = 0; j < _this.rptResult.Link.length; j++) {
-          let link = _this.rptResult.Link[j];
-          let linkResult = _this.rptResult.LinkResults[j];
-          let child = {
-            value: link.toLowerCase(),
-            label: link,
-            children: [
-              {
-                value: "Flow",
-                label: "管道流量(m³/s)",
-                data: linkResult.Flow,
-              },
-              {
-                value: "Velocity",
-                label: "水流速度(m/s)",
-                data: linkResult.Velocity,
-              },
-              {
-                value: "Depth",
-                label: "管道水深(m)",
-                data: linkResult.Depth,
-              },
-              {
-                value: "Capacity",
-                label: "管道容量",
-                data: linkResult.Capacity,
-              },
-            ],
-          };
-          _this.options[1].children.push(child);
-        }
-        _this.changeChooseMap(_this);
-        _this.map.addSource("source-id" + _this.layerNumber, {
-          type: "geojson",
-          data: _this.geojsonObject,
-        });
-        let ll = 1;
-        _this.map.addLayer({
-          id: "vectorLayer" + _this.layerNumber + "line",
-          type: "line",
-          source: "source-id" + _this.layerNumber,
-          paint: {
-            "line-width": 3,
-            "line-color": [
-              "case",
-              ["<", ["get", "value"], _this.linkmin],
-              "#ffffff", //<10.8
-              ["<", ["get", "value"], _this.linkmin + ll * _this.linkstep],
-              "#51e1e6", //>=10.8 & <17.2
-              [
-                "<",
-                ["get", "value"],
-                _this.linkmin + (ll + 1) * _this.linkstep,
+      Promise.all([f, ff])
+        .then((array) => {
+          _this.rptResult = array[0];
+          _this.geojsonObject = array[1];
+          _this.options = [
+            {
+              value: "node",
+              label: "Node Results",
+              children: [],
+            },
+            {
+              value: "link",
+              label: "Link Results",
+              children: [],
+            },
+          ];
+          // chart Tab
+          for (let i = 0; i < _this.rptResult.Node.length; i++) {
+            let node = _this.rptResult.Node[i];
+            let nodeResult = _this.rptResult.NodeResults[i];
+            let child = {
+              value: node.toLowerCase(),
+              label: node,
+              children: [
+                {
+                  value: "Inflow",
+                  label: "入流量(m³/s)",
+                  data: nodeResult.Inflow,
+                },
+                {
+                  value: "Flooding",
+                  label: "管点溢流(m³/s)",
+                  data: nodeResult.Flooding,
+                },
+                {
+                  value: "Depth",
+                  label: "管点深度(m)",
+                  data: nodeResult.Depth,
+                },
+                {
+                  value: "Head",
+                  label: "管点水头(m)",
+                  data: nodeResult.Head,
+                },
               ],
-              "#40a9d9",
-              [
-                "<",
-                ["get", "value"],
-                _this.linkmin + (ll + 2) * _this.linkstep,
+            };
+            _this.options[0].children.push(child);
+          }
+          for (let j = 0; j < _this.rptResult.Link.length; j++) {
+            let link = _this.rptResult.Link[j];
+            let linkResult = _this.rptResult.LinkResults[j];
+            let child = {
+              value: link.toLowerCase(),
+              label: link,
+              children: [
+                {
+                  value: "Flow",
+                  label: "管道流量(m³/s)",
+                  data: linkResult.Flow,
+                },
+                {
+                  value: "Velocity",
+                  label: "水流速度(m/s)",
+                  data: linkResult.Velocity,
+                },
+                {
+                  value: "Depth",
+                  label: "管道水深(m)",
+                  data: linkResult.Depth,
+                },
+                {
+                  value: "Capacity",
+                  label: "管道容量",
+                  data: linkResult.Capacity,
+                },
               ],
-              "#3175ce",
-              [
-                "<=",
-                ["get", "value"],
-                _this.linkmin + (ll + 3) * _this.linkstep,
-              ],
-              "#2549c4",
-              [
-                "<=",
-                ["get", "value"],
-                _this.linkmin + (ll + 4) * _this.linkstep,
-              ],
-              "#140fb8", //>=41.5 & <50.1
-              "#140fb8", // 默认值, >=50.1
-            ],
-          },
-          filter: ["in", "$type", "LineString"],
-        });
+            };
+            _this.options[1].children.push(child);
+          }
+          _this.changeChooseMap(_this);
+          if (_this.layerNumber > 0) {
+            _this.map.removeLayer(
+              "vectorLayer" + (_this.layerNumber - 1) + "line"
+            );
+            _this.map.removeLayer(
+              "vectorLayer" + (_this.layerNumber - 1) + "point"
+            );
+            _this.map.removeSource("source-id" + (_this.layerNumber - 1));
 
-        _this.map.addLayer({
-          id: "vectorLayer" + _this.layerNumber + "point",
-          type: "circle",
-          source: "source-id" + _this.layerNumber,
-          paint: {
-            "circle-color": [
-              "case",
-              ["<", ["get", "value"], _this.nodemin],
-              "#ffffff", //<10.8
-              ["<", ["get", "value"], _this.nodemin + ll * _this.nodestep],
-              "#fdd519", //>=10.8 & <17.2
-              [
-                "<",
-                ["get", "value"],
-                _this.nodemin + (ll + 1) * _this.nodestep,
+            _this.layerNumber--;
+          }
+          _this.map.addSource("source-id" + _this.layerNumber, {
+            type: "geojson",
+            data: _this.geojsonObject,
+          });
+          let ll = 1;
+          _this.map.addLayer({
+            id: "vectorLayer" + _this.layerNumber + "line",
+            type: "line",
+            source: "source-id" + _this.layerNumber,
+            paint: {
+              "line-width": 3,
+              "line-color": [
+                "case",
+                ["<", ["get", "value"], _this.linkmin],
+                "#ffffff", //<10.8
+                ["<", ["get", "value"], _this.linkmin + ll * _this.linkstep],
+                "#51e1e6", //>=10.8 & <17.2
+                [
+                  "<",
+                  ["get", "value"],
+                  _this.linkmin + (ll + 1) * _this.linkstep,
+                ],
+                "#40a9d9",
+                [
+                  "<",
+                  ["get", "value"],
+                  _this.linkmin + (ll + 2) * _this.linkstep,
+                ],
+                "#3175ce",
+                [
+                  "<=",
+                  ["get", "value"],
+                  _this.linkmin + (ll + 3) * _this.linkstep,
+                ],
+                "#2549c4",
+                [
+                  "<=",
+                  ["get", "value"],
+                  _this.linkmin + (ll + 4) * _this.linkstep,
+                ],
+                "#140fb8", //>=41.5 & <50.1
+                "#140fb8", // 默认值, >=50.1
               ],
-              "#f8a114",
-              [
-                "<",
-                ["get", "value"],
-                _this.nodemin + (ll + 2) * _this.nodestep,
-              ],
-              "#f36f0f",
-              [
-                "<=",
-                ["get", "value"],
-                _this.nodemin + (ll + 3) * _this.nodestep,
-              ],
-              "#ee430b",
-              [
-                "<=",
-                ["get", "value"],
-                _this.nodemin + (ll + 4) * _this.nodestep,
-              ],
-              "#e90806", //>=41.5 & <50.1
-              "#e90806", // 默认值, >=50.1
-            ],
-          },
-          filter: ["in", "$type", "Point"],
-        });
-        //_this.SetPop(_this);
-        _this.layerNumber++;
+            },
+            filter: ["in", "$type", "LineString"],
+          });
 
-        // slider
-        _this.timeSliderMap = false;
-        _this.maxSlider = _this.rptResult.Date.length;
-        _this.marks = {
-          1: _this.formatTooltip(1),
-        };
-        // btn
-        _this.startBtn = false;
-        _this.conduitStartBtn = false;
-      });
+          _this.map.addLayer({
+            id: "vectorLayer" + _this.layerNumber + "point",
+            type: "circle",
+            source: "source-id" + _this.layerNumber,
+            paint: {
+              "circle-color": [
+                "case",
+                ["<", ["get", "value"], _this.nodemin],
+                "#ffffff", //<10.8
+                ["<", ["get", "value"], _this.nodemin + ll * _this.nodestep],
+                "#fdd519", //>=10.8 & <17.2
+                [
+                  "<",
+                  ["get", "value"],
+                  _this.nodemin + (ll + 1) * _this.nodestep,
+                ],
+                "#f8a114",
+                [
+                  "<",
+                  ["get", "value"],
+                  _this.nodemin + (ll + 2) * _this.nodestep,
+                ],
+                "#f36f0f",
+                [
+                  "<=",
+                  ["get", "value"],
+                  _this.nodemin + (ll + 3) * _this.nodestep,
+                ],
+                "#ee430b",
+                [
+                  "<=",
+                  ["get", "value"],
+                  _this.nodemin + (ll + 4) * _this.nodestep,
+                ],
+                "#e90806", //>=41.5 & <50.1
+                "#e90806", // 默认值, >=50.1
+              ],
+            },
+            filter: ["in", "$type", "Point"],
+          });
+          _this.SetPop(_this.layerNumber);
+          _this.layerNumber++;
+
+          // slider
+          _this.timeSliderMap = false;
+          _this.maxSlider = _this.rptResult.Date.length;
+          _this.marks = {
+            1: _this.formatTooltip(1),
+          };
+          // btn
+          _this.startBtn = false;
+          _this.conduitStartBtn = false;
+          setTimeout(function () {
+            _this.loading = false;
+          }, 300);
+        })
+        
+          
+        
     },
     Npopclick(e) {
       e.preventDefault();
@@ -475,7 +600,10 @@ export default {
         .find((child) => child.label == e.features[0].properties.name)
         .children.find((Flooding) => Flooding.value == this.NT_showInPop).data;
       let x = this.rptResult.Date;
-      Ppop = new mapboxgl.Popup({ className: "Point_pop", maxWidth: "800px" })
+      new mapboxgl.Popup({
+        className: "Point_pop",
+        maxWidth: "800px",
+      })
         .setLngLat(e.lngLat)
         .setHTML(
           "<div id=" + "e_chart_P" + " style='height:400px;width:600px;'></div>"
@@ -499,16 +627,18 @@ export default {
 
         let y = this.options[1].children
           .find((child) => child.label == e.features[0].properties.name)
-          .children.find((Flooding) => Flooding.value == "Depth").data;
+          .children.find(
+            (Flooding) => Flooding.value == this.LT_showInPop
+          ).data;
         let x = this.rptResult.Date;
-        Lpop = new mapboxgl.Popup({ maxWidth: "800px" })
+        new mapboxgl.Popup({ maxWidth: "800px" })
           .setLngLat(e.lngLat)
           .setHTML(
             "<div id='e_chart_L' style='height:400px;width:600px;'></div>"
           )
           .addTo(this.map);
         setTimeout(() => {
-          this.initEchart(x, y, "e_chart_L", "Depth");
+          this.initEchart(x, y, "e_chart_L", this.LT_showInPop);
         }, 1);
       }
     },
@@ -518,38 +648,49 @@ export default {
     mleave(e) {
       this.map.getCanvas().style.cursor = "";
     },
-    SetPop(_this, layerN) {
-      if (Ppop != "") {
-        Ppop.remove();
-        _this.map.off(
-          "click",
-          "vectorLayer" + layerN + "point",
-          _this.Npopclick
-        );
-      }
-      if(Lpop!=""){
-        Lpop.remove();
-        _this.map.off(
-          "click",
-          "vectorLayer" + layerN + "line",
-          _this.LPopclick
-        );
-      }
+    SetPop(layerN) {
+      if (this.map._listeners.click) {
+        if (this.map._listeners.click.length > 0) {
+          console.log(this.map._listeners);
 
-      _this.map.on(
-        "mouseenter",
-        "vectorLayer" + layerN + "point",
-        _this.menter
-      );
-      _this.map.on(
-        "mouseleave",
-        "vectorLayer" + layerN + "point",
-        _this.mleave
-      );
-      _this.map.on("mouseenter", "vectorLayer" + layerN + "line", _this.menter);
-      _this.map.on("mouseleave", "vectorLayer" + layerN + "line", _this.mleave);
-      _this.map.on("click", "vectorLayer" + layerN + "point", _this.Npopclick);
-      _this.map.on("click", "vectorLayer" + layerN + "line", _this.LPopclick);
+          this.map.off(
+            "click",
+            "vectorLayer" + layerN + "point",
+            this.Npopclick
+          );
+          this.map.off(
+            "click",
+            "vectorLayer" + layerN + "line",
+            this.LPopclick
+          );
+          this.map.off(
+            "mouseenter",
+            "vectorLayer" + layerN + "point",
+            this.menter
+          );
+          this.map.off(
+            "mouseleave",
+            "vectorLayer" + layerN + "point",
+            this.mleave
+          );
+          this.map.off(
+            "mouseenter",
+            "vectorLayer" + layerN + "line",
+            this.menter
+          );
+          this.map.off(
+            "mouseleave",
+            "vectorLayer" + layerN + "line",
+            this.mleave
+          );
+        }
+      }
+      this.map.on("mouseenter", "vectorLayer" + layerN + "point", this.menter);
+      this.map.on("mouseleave", "vectorLayer" + layerN + "point", this.mleave);
+      this.map.on("mouseenter", "vectorLayer" + layerN + "line", this.menter);
+      this.map.on("mouseleave", "vectorLayer" + layerN + "line", this.mleave);
+      this.map.on("click", "vectorLayer" + layerN + "point", this.Npopclick);
+      this.map.on("click", "vectorLayer" + layerN + "line", this.LPopclick);
     },
     changeChooseMap(e) {
       // 还原slider
@@ -564,7 +705,9 @@ export default {
       for (let i = 0; i < e.options[0].children.length; i++) {
         // node
         let node = e.options[0].children[i];
-        let element = node.children[e.nodeRadio];
+        let element = node.children.find(
+          (Flooding) => Flooding.value == this.NT_showInPop
+        );
         e.nodeResultArr.push(element.data); // 汇总该属性的所有模拟值
       }
       for (let k = 0; k < e.rptResult.Node.length; k++) {
@@ -575,7 +718,9 @@ export default {
       for (let i = 0; i < e.options[1].children.length; i++) {
         // link
         let link = e.options[1].children[i];
-        let element = link.children[e.linkRadio];
+        let element = link.children.find(
+          (Flooding) => Flooding.value == this.LT_showInPop
+        );
         e.linkResultArr.push(element.data);
       }
       for (let k = 0; k < e.rptResult.Link.length; k++) {
@@ -584,40 +729,40 @@ export default {
         feat.properties.value = e.linkResultArr[k][0];
       }
       // 获取最大最小值
-      if (e.nodeRadio == 0) {
+      if (this.NT_showInPop == "Inflow") {
         // node
         e.nodemin = e.rptResult.MaxMin.node.minInflow;
         e.nodemax = e.rptResult.MaxMin.node.maxInflow;
 
         let max = e.rptResult.MaxMin.node.maxInflow;
         e.nodestep = (e.nodemax - e.nodemin) / 5;
-      } else if (e.nodeRadio == 1) {
+      } else if (this.NT_showInPop == "Flooding") {
         e.nodemin = e.rptResult.MaxMin.node.minFlooding;
         e.nodemax = e.rptResult.MaxMin.node.maxFlooding;
         e.nodestep = (e.nodemax - e.nodemin) / 5;
-      } else if (e.nodeRadio == 2) {
+      } else if (this.NT_showInPop == "Depth") {
         e.nodemin = e.rptResult.MaxMin.node.minDepth;
         e.nodemax = e.rptResult.MaxMin.node.maxDepth;
         e.nodestep = (e.nodemax - e.nodemin) / 5;
-      } else if (e.nodeRadio == 3) {
+      } else if (this.NT_showInPop == "Head") {
         e.nodemin = e.rptResult.MaxMin.node.minHead;
         e.nodemax = e.rptResult.MaxMin.node.maxHead;
         e.nodestep = (e.nodemax - e.nodemin) / 5;
       }
-      if (e.linkRadio == 0) {
+      if (this.LT_showInPop == "Flow") {
         // link
         e.linkmin = e.rptResult.MaxMin.link.minFlow;
         e.linkmax = e.rptResult.MaxMin.link.maxFlow;
         e.linkstep = (e.linkmax - e.linkmin) / 5;
-      } else if (e.linkRadio == 1) {
+      } else if (this.LT_showInPop == "Velocity") {
         e.linkmin = e.rptResult.MaxMin.link.minVelocity;
         e.linkmax = e.rptResult.MaxMin.link.maxVelocity;
         e.linkstep = (e.linkmax - e.linkmin) / 5;
-      } else if (e.linkRadio == 2) {
+      } else if (this.LT_showInPop == "Depth") {
         e.linkmin = e.rptResult.MaxMin.link.minDepth;
         e.linkmax = e.rptResult.MaxMin.link.maxDepth;
         e.linkstep = (e.linkmax - e.linkmin) / 5;
-      } else if (e.linkRadio == 3) {
+      } else if (this.LT_showInPop == "Capacity") {
         e.linkmin = e.rptResult.MaxMin.link.minCapacity;
         e.linkmax = e.rptResult.MaxMin.link.maxCapacity;
         e.linkstep = (e.linkmax - e.linkmin) / 5;
@@ -695,6 +840,7 @@ export default {
       this.startBtn = true;
       this.pauseBtn = false;
       let _this = this;
+      console.log(_this.nodeResultArr);
       _this.intevalAnima = setInterval(() => {
         if (_this.numberAnima == _this.rptResult.Date.length) {
           _this.numberAnima = 0;
@@ -744,6 +890,13 @@ export default {
 .el-tabs__item.is-left {
   flex: 1;
 }
+.select {
+  display: flex;
+}
+.el-select {
+  flex: 1;
+  padding: 5px;
+}
 #map {
   height: calc(100vh - 120px);
 }
@@ -772,6 +925,8 @@ export default {
   margin-top: 10px;
   border-radius: 15px;
   opacity: 0.8;
+  transition: width 2s;
+  transition: height 2s;
 }
 
 #time-slider {
