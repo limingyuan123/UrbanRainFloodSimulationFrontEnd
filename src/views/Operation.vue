@@ -204,7 +204,9 @@ import { UploadFilled,Bottom,Pointer,View,VideoPlay,Promotion } from '@element-p
 import { reactive, ref, computed ,toRefs} from 'vue';
 import axios from 'axios'
 import {ElMessage } from 'element-plus'
-import {  useRouter} from 'vue-router'
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex';
+const store = useStore();
 const router = useRouter();
 let dialog = reactive({
     dialogVisible:false,
@@ -476,9 +478,10 @@ const downloadOutput = () =>{
     console.log(err);
   })      
 };
-
-const showMap = () => {
-  router.push('/couple')
+//跳转到耦合结果展示页面
+const showMap = () => {  
+  store.commit('setIndex', '3');
+  router.push('/couple');
 }
 //#endregion
 
