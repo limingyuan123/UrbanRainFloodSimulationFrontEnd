@@ -25,144 +25,274 @@
           @tab-click="handleClick"
           stretch
         >
-          <el-tab-pane label="72mm" name="quo_5">
-            <div class="select">
-              <el-select
-                v-model="NT_showInPop"
-                placeholder=""
-                @change="selectChange"
-              >
-                <el-option
-                  v-for="item in NodePopType"
-                  :key="item"
-                  :label="item.value"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-              <el-select
-                v-model="LT_showInPop"
-                placeholder=""
-                @change="selectChange"
-              >
-                <el-option
-                  v-for="item in LinkPopType"
-                  :key="item"
-                  :label="item.value"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
+          <el-tab-pane label="72mm" name="quo_5" style="height: 100%">
+            <div class="spart">
+              <div class="select">
+                <div><h3>选择点属性</h3></div>
+                <el-radio-group
+                  style="margin: 5px"
+                  v-model="NT_showInPop"
+                  size="large"
+                  @change="selectChange"
+                  class="radioDiv"
+                  fill="#409EFF"
+                  text-color="#ffffff"
+                >
+                  <el-radio-button label="Inflow" name="Inflow"
+                    >入流量</el-radio-button
+                  >
+                  <el-radio-button label="Flooding" name="Flooding"
+                    >管点溢流</el-radio-button
+                  >
+                  <el-radio-button label="Depth" name="Depth"
+                    >管点深度</el-radio-button
+                  >
+                  <el-radio-button label="Head" name="Head"
+                    >管点水头</el-radio-button
+                  >
+                </el-radio-group>
+              </div>
+              <div class="select">
+                <div><h3>选择线属性</h3></div>
+                <el-radio-group
+                  v-model="LT_showInPop"
+                  size="large"
+                  style="margin: 5px"
+                  @change="selectChange"
+                  class="radioDiv"
+                  fill="#409EFF"
+                  text-color="#ffffff"
+                >
+                  <el-radio-button label="Flow" name="Flow"
+                    >管线流量</el-radio-button
+                  >
+                  <el-radio-button label="Velocity" name="Velocity"
+                    >水流速度</el-radio-button
+                  >
+                  <el-radio-button label="Depth" name="Depth"
+                    >管线深度</el-radio-button
+                  >
+                  <el-radio-button label="Capacity" name="Capacity"
+                    >管线容量</el-radio-button
+                  >
+                </el-radio-group>
+              </div>
             </div>
           </el-tab-pane>
           <el-tab-pane label="89mm" name="quo_10">
-            <div class="select">
-              <el-select
-                v-model="NT_showInPop"
-                placeholder=""
-                @change="selectChange"
-              >
-                <el-option
-                  v-for="item in NodePopType"
-                  :key="item"
-                  :label="item.value"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-              <el-select
-                v-model="LT_showInPop"
-                placeholder=""
-                @change="selectChange"
-              >
-                <el-option
-                  v-for="item in LinkPopType"
-                  :key="item"
-                  :label="item.value"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
+            <div class="spart">
+              <div class="select">
+                <div><h3>选择点属性</h3></div>
+                <el-radio-group
+                  style="margin: 5px"
+                  v-model="NT_showInPop"
+                  size="large"
+                  @change="selectChange"
+                  class="radioDiv"
+                  fill="#409EFF"
+                  text-color="#ffffff"
+                >
+                  <el-radio-button label="Inflow" name="Inflow"
+                    >入流量</el-radio-button
+                  >
+                  <el-radio-button label="Flooding" name="Flooding"
+                    >管点溢流</el-radio-button
+                  >
+                  <el-radio-button label="Depth" name="Depth"
+                    >管点深度</el-radio-button
+                  >
+                  <el-radio-button label="Head" name="Head"
+                    >管点水头</el-radio-button
+                  >
+                </el-radio-group>
+              </div>
+              <div class="select">
+                <div><h3>选择线属性</h3></div>
+                <el-radio-group
+                  v-model="LT_showInPop"
+                  size="large"
+                  style="margin: 5px"
+                  @change="selectChange"
+                  class="radioDiv"
+                  fill="#409EFF"
+                  text-color="#ffffff"
+                >
+                  <el-radio-button label="Flow" name="Flow"
+                    >管线流量</el-radio-button
+                  >
+                  <el-radio-button label="Velocity" name="Velocity"
+                    >水流速度</el-radio-button
+                  >
+                  <el-radio-button label="Depth" name="Depth"
+                    >管线深度</el-radio-button
+                  >
+                  <el-radio-button label="Capacity" name="Capacity"
+                    >管线容量</el-radio-button
+                  >
+                </el-radio-group>
+              </div>
             </div>
           </el-tab-pane>
           <el-tab-pane label="104mm" name="quo_20">
-            <div class="select">
-              <el-select
-                v-model="NT_showInPop"
-                placeholder=""
-                @change="selectChange"
-              >
-                <el-option
-                  v-for="item in NodePopType"
-                  :key="item"
-                  :label="item.value"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-              <el-select
-                v-model="LT_showInPop"
-                placeholder=""
-                @change="selectChange"
-              >
-                <el-option
-                  v-for="item in LinkPopType"
-                  :key="item"
-                  :label="item.value"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
+            <div class="spart">
+              <div class="select">
+                <div><h3>选择点属性</h3></div>
+                <el-radio-group
+                  style="margin: 5px"
+                  v-model="NT_showInPop"
+                  size="large"
+                  @change="selectChange"
+                  class="radioDiv"
+                  fill="#409EFF"
+                  text-color="#ffffff"
+                >
+                  <el-radio-button label="Inflow" name="Inflow"
+                    >入流量</el-radio-button
+                  >
+                  <el-radio-button label="Flooding" name="Flooding"
+                    >管点溢流</el-radio-button
+                  >
+                  <el-radio-button label="Depth" name="Depth"
+                    >管点深度</el-radio-button
+                  >
+                  <el-radio-button label="Head" name="Head"
+                    >管点水头</el-radio-button
+                  >
+                </el-radio-group>
+              </div>
+              <div class="select">
+                <div><h3>选择线属性</h3></div>
+                <el-radio-group
+                  v-model="LT_showInPop"
+                  size="large"
+                  style="margin: 5px"
+                  @change="selectChange"
+                  class="radioDiv"
+                  fill="#409EFF"
+                  text-color="#ffffff"
+                >
+                  <el-radio-button label="Flow" name="Flow"
+                    >管线流量</el-radio-button
+                  >
+                  <el-radio-button label="Velocity" name="Velocity"
+                    >水流速度</el-radio-button
+                  >
+                  <el-radio-button label="Depth" name="Depth"
+                    >管线深度</el-radio-button
+                  >
+                  <el-radio-button label="Capacity" name="Capacity"
+                    >管线容量</el-radio-button
+                  >
+                </el-radio-group>
+              </div>
             </div>
           </el-tab-pane>
           <el-tab-pane label="112mm" name="quo_30">
-            <div class="select">
-              <el-select
-                v-model="NT_showInPop"
-                placeholder=""
-                @change="selectChange"
-              >
-                <el-option
-                  v-for="item in NodePopType"
-                  :key="item"
-                  :label="item.value"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-              <el-select
-                v-model="LT_showInPop"
-                placeholder=""
-                @change="selectChange"
-              >
-                <el-option
-                  v-for="item in LinkPopType"
-                  :key="item"
-                  :label="item.value"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
+            <div class="spart">
+              <div class="select">
+                <div><h3>选择点属性</h3></div>
+                <el-radio-group
+                  style="margin: 5px"
+                  v-model="NT_showInPop"
+                  size="large"
+                  @change="selectChange"
+                  class="radioDiv"
+                  fill="#409EFF"
+                  text-color="#ffffff"
+                >
+                  <el-radio-button label="Inflow" name="Inflow"
+                    >入流量</el-radio-button
+                  >
+                  <el-radio-button label="Flooding" name="Flooding"
+                    >管点溢流</el-radio-button
+                  >
+                  <el-radio-button label="Depth" name="Depth"
+                    >管点深度</el-radio-button
+                  >
+                  <el-radio-button label="Head" name="Head"
+                    >管点水头</el-radio-button
+                  >
+                </el-radio-group>
+              </div>
+              <div class="select">
+                <div><h3>选择线属性</h3></div>
+                <el-radio-group
+                  v-model="LT_showInPop"
+                  size="large"
+                  style="margin: 5px"
+                  @change="selectChange"
+                  class="radioDiv"
+                  fill="#409EFF"
+                  text-color="#ffffff"
+                >
+                  <el-radio-button label="Flow" name="Flow"
+                    >管线流量</el-radio-button
+                  >
+                  <el-radio-button label="Velocity" name="Velocity"
+                    >水流速度</el-radio-button
+                  >
+                  <el-radio-button label="Depth" name="Depth"
+                    >管线深度</el-radio-button
+                  >
+                  <el-radio-button label="Capacity" name="Capacity"
+                    >管线容量</el-radio-button
+                  >
+                </el-radio-group>
+              </div>
             </div>
           </el-tab-pane>
           <el-tab-pane label="121mm" name="quo_50">
-            <div class="select">
-              <el-select
-                v-model="NT_showInPop"
-                placeholder=""
-                @change="selectChange"
-              >
-                <el-option
-                  v-for="item in NodePopType"
-                  :key="item"
-                  :label="item.value"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-              <el-select
-                v-model="LT_showInPop"
-                placeholder=""
-                @change="selectChange"
-              >
-                <el-option
-                  v-for="item in LinkPopType"
-                  :key="item"
-                  :label="item.value"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
+            <div class="spart">
+              <div class="select">
+                <div><h3>选择点属性</h3></div>
+                <el-radio-group
+                  style="margin: 5px"
+                  v-model="NT_showInPop"
+                  size="large"
+                  @change="selectChange"
+                  class="radioDiv"
+                  fill="#409EFF"
+                  text-color="#ffffff"
+                >
+                  <el-radio-button label="Inflow" name="Inflow"
+                    >入流量</el-radio-button
+                  >
+                  <el-radio-button label="Flooding" name="Flooding"
+                    >管点溢流</el-radio-button
+                  >
+                  <el-radio-button label="Depth" name="Depth"
+                    >管点深度</el-radio-button
+                  >
+                  <el-radio-button label="Head" name="Head"
+                    >管点水头</el-radio-button
+                  >
+                </el-radio-group>
+              </div>
+              <div class="select">
+                <div><h3>选择线属性</h3></div>
+                <el-radio-group
+                  v-model="LT_showInPop"
+                  size="large"
+                  style="margin: 5px"
+                  @change="selectChange"
+                  class="radioDiv"
+                  fill="#409EFF"
+                  text-color="#ffffff"
+                >
+                  <el-radio-button label="Flow" name="Flow"
+                    >管线流量</el-radio-button
+                  >
+                  <el-radio-button label="Velocity" name="Velocity"
+                    >水流速度</el-radio-button
+                  >
+                  <el-radio-button label="Depth" name="Depth"
+                    >管线深度</el-radio-button
+                  >
+                  <el-radio-button label="Capacity" name="Capacity"
+                    >管线容量</el-radio-button
+                  >
+                </el-radio-group>
+              </div>
             </div>
           </el-tab-pane>
         </el-tabs>
@@ -266,6 +396,7 @@ export default {
       startBtn: true,
       pauseBtn: true,
       date: [],
+      False: false,
       intevalAnima: null,
       curDateIndex: 0,
       curYear: "5year",
@@ -391,203 +522,199 @@ export default {
       let ff = this.getGeojson(this, geo_url);
       let _this = this;
 
-      Promise.all([f, ff])
-        .then((array) => {
-          _this.rptResult = array[0];
-          _this.geojsonObject = array[1];
-          _this.options = [
-            {
-              value: "node",
-              label: "Node Results",
-              children: [],
-            },
-            {
-              value: "link",
-              label: "Link Results",
-              children: [],
-            },
-          ];
-          // chart Tab
-          for (let i = 0; i < _this.rptResult.Node.length; i++) {
-            let node = _this.rptResult.Node[i];
-            let nodeResult = _this.rptResult.NodeResults[i];
-            let child = {
-              value: node.toLowerCase(),
-              label: node,
-              children: [
-                {
-                  value: "Inflow",
-                  label: "入流量(m³/s)",
-                  data: nodeResult.Inflow,
-                },
-                {
-                  value: "Flooding",
-                  label: "管点溢流(m³/s)",
-                  data: nodeResult.Flooding,
-                },
-                {
-                  value: "Depth",
-                  label: "管点深度(m)",
-                  data: nodeResult.Depth,
-                },
-                {
-                  value: "Head",
-                  label: "管点水头(m)",
-                  data: nodeResult.Head,
-                },
-              ],
-            };
-            _this.options[0].children.push(child);
-          }
-          for (let j = 0; j < _this.rptResult.Link.length; j++) {
-            let link = _this.rptResult.Link[j];
-            let linkResult = _this.rptResult.LinkResults[j];
-            let child = {
-              value: link.toLowerCase(),
-              label: link,
-              children: [
-                {
-                  value: "Flow",
-                  label: "管道流量(m³/s)",
-                  data: linkResult.Flow,
-                },
-                {
-                  value: "Velocity",
-                  label: "水流速度(m/s)",
-                  data: linkResult.Velocity,
-                },
-                {
-                  value: "Depth",
-                  label: "管道水深(m)",
-                  data: linkResult.Depth,
-                },
-                {
-                  value: "Capacity",
-                  label: "管道容量",
-                  data: linkResult.Capacity,
-                },
-              ],
-            };
-            _this.options[1].children.push(child);
-          }
-          _this.changeChooseMap(_this);
-          if (_this.layerNumber > 0) {
-            _this.map.removeLayer(
-              "vectorLayer" + (_this.layerNumber - 1) + "line"
-            );
-            _this.map.removeLayer(
-              "vectorLayer" + (_this.layerNumber - 1) + "point"
-            );
-            _this.map.removeSource("source-id" + (_this.layerNumber - 1));
-
-            _this.layerNumber--;
-          }
-          _this.map.addSource("source-id" + _this.layerNumber, {
-            type: "geojson",
-            data: _this.geojsonObject,
-          });
-          let ll = 1;
-          _this.map.addLayer({
-            id: "vectorLayer" + _this.layerNumber + "line",
-            type: "line",
-            source: "source-id" + _this.layerNumber,
-            paint: {
-              "line-width": 3,
-              "line-color": [
-                "case",
-                ["<", ["get", "value"], _this.linkmin],
-                "#ffffff", //<10.8
-                ["<", ["get", "value"], _this.linkmin + ll * _this.linkstep],
-                "#51e1e6", //>=10.8 & <17.2
-                [
-                  "<",
-                  ["get", "value"],
-                  _this.linkmin + (ll + 1) * _this.linkstep,
-                ],
-                "#40a9d9",
-                [
-                  "<",
-                  ["get", "value"],
-                  _this.linkmin + (ll + 2) * _this.linkstep,
-                ],
-                "#3175ce",
-                [
-                  "<=",
-                  ["get", "value"],
-                  _this.linkmin + (ll + 3) * _this.linkstep,
-                ],
-                "#2549c4",
-                [
-                  "<=",
-                  ["get", "value"],
-                  _this.linkmin + (ll + 4) * _this.linkstep,
-                ],
-                "#140fb8", //>=41.5 & <50.1
-                "#140fb8", // 默认值, >=50.1
-              ],
-            },
-            filter: ["in", "$type", "LineString"],
-          });
-
-          _this.map.addLayer({
-            id: "vectorLayer" + _this.layerNumber + "point",
-            type: "circle",
-            source: "source-id" + _this.layerNumber,
-            paint: {
-              "circle-color": [
-                "case",
-                ["<", ["get", "value"], _this.nodemin],
-                "#ffffff", //<10.8
-                ["<", ["get", "value"], _this.nodemin + ll * _this.nodestep],
-                "#fdd519", //>=10.8 & <17.2
-                [
-                  "<",
-                  ["get", "value"],
-                  _this.nodemin + (ll + 1) * _this.nodestep,
-                ],
-                "#f8a114",
-                [
-                  "<",
-                  ["get", "value"],
-                  _this.nodemin + (ll + 2) * _this.nodestep,
-                ],
-                "#f36f0f",
-                [
-                  "<=",
-                  ["get", "value"],
-                  _this.nodemin + (ll + 3) * _this.nodestep,
-                ],
-                "#ee430b",
-                [
-                  "<=",
-                  ["get", "value"],
-                  _this.nodemin + (ll + 4) * _this.nodestep,
-                ],
-                "#e90806", //>=41.5 & <50.1
-                "#e90806", // 默认值, >=50.1
-              ],
-            },
-            filter: ["in", "$type", "Point"],
-          });
-          _this.SetPop(_this.layerNumber);
-          _this.layerNumber++;
-
-          // slider
-          _this.timeSliderMap = false;
-          _this.maxSlider = _this.rptResult.Date.length;
-          _this.marks = {
-            1: _this.formatTooltip(1),
+      Promise.all([f, ff]).then((array) => {
+        _this.rptResult = array[0];
+        _this.geojsonObject = array[1];
+        _this.options = [
+          {
+            value: "node",
+            label: "Node Results",
+            children: [],
+          },
+          {
+            value: "link",
+            label: "Link Results",
+            children: [],
+          },
+        ];
+        // chart Tab
+        for (let i = 0; i < _this.rptResult.Node.length; i++) {
+          let node = _this.rptResult.Node[i];
+          let nodeResult = _this.rptResult.NodeResults[i];
+          let child = {
+            value: node.toLowerCase(),
+            label: node,
+            children: [
+              {
+                value: "Inflow",
+                label: "入流量(m³/s)",
+                data: nodeResult.Inflow,
+              },
+              {
+                value: "Flooding",
+                label: "管点溢流(m³/s)",
+                data: nodeResult.Flooding,
+              },
+              {
+                value: "Depth",
+                label: "管点深度(m)",
+                data: nodeResult.Depth,
+              },
+              {
+                value: "Head",
+                label: "管点水头(m)",
+                data: nodeResult.Head,
+              },
+            ],
           };
-          // btn
-          _this.startBtn = false;
-          _this.conduitStartBtn = false;
-          setTimeout(function () {
-            _this.loading = false;
-          }, 300);
-        })
-        
-          
-        
+          _this.options[0].children.push(child);
+        }
+        for (let j = 0; j < _this.rptResult.Link.length; j++) {
+          let link = _this.rptResult.Link[j];
+          let linkResult = _this.rptResult.LinkResults[j];
+          let child = {
+            value: link.toLowerCase(),
+            label: link,
+            children: [
+              {
+                value: "Flow",
+                label: "管道流量(m³/s)",
+                data: linkResult.Flow,
+              },
+              {
+                value: "Velocity",
+                label: "水流速度(m/s)",
+                data: linkResult.Velocity,
+              },
+              {
+                value: "Depth",
+                label: "管道水深(m)",
+                data: linkResult.Depth,
+              },
+              {
+                value: "Capacity",
+                label: "管道容量",
+                data: linkResult.Capacity,
+              },
+            ],
+          };
+          _this.options[1].children.push(child);
+        }
+        _this.changeChooseMap(_this);
+        if (_this.layerNumber > 0) {
+          _this.map.removeLayer(
+            "vectorLayer" + (_this.layerNumber - 1) + "line"
+          );
+          _this.map.removeLayer(
+            "vectorLayer" + (_this.layerNumber - 1) + "point"
+          );
+          _this.map.removeSource("source-id" + (_this.layerNumber - 1));
+
+          _this.layerNumber--;
+        }
+        _this.map.addSource("source-id" + _this.layerNumber, {
+          type: "geojson",
+          data: _this.geojsonObject,
+        });
+        let ll = 1;
+        _this.map.addLayer({
+          id: "vectorLayer" + _this.layerNumber + "line",
+          type: "line",
+          source: "source-id" + _this.layerNumber,
+          paint: {
+            "line-width": 3,
+            "line-color": [
+              "case",
+              ["<", ["get", "value"], _this.linkmin],
+              "#ffffff", //<10.8
+              ["<", ["get", "value"], _this.linkmin + ll * _this.linkstep],
+              "#51e1e6", //>=10.8 & <17.2
+              [
+                "<",
+                ["get", "value"],
+                _this.linkmin + (ll + 1) * _this.linkstep,
+              ],
+              "#40a9d9",
+              [
+                "<",
+                ["get", "value"],
+                _this.linkmin + (ll + 2) * _this.linkstep,
+              ],
+              "#3175ce",
+              [
+                "<=",
+                ["get", "value"],
+                _this.linkmin + (ll + 3) * _this.linkstep,
+              ],
+              "#2549c4",
+              [
+                "<=",
+                ["get", "value"],
+                _this.linkmin + (ll + 4) * _this.linkstep,
+              ],
+              "#140fb8", //>=41.5 & <50.1
+              "#140fb8", // 默认值, >=50.1
+            ],
+          },
+          filter: ["in", "$type", "LineString"],
+        });
+
+        _this.map.addLayer({
+          id: "vectorLayer" + _this.layerNumber + "point",
+          type: "circle",
+          source: "source-id" + _this.layerNumber,
+          paint: {
+            "circle-color": [
+              "case",
+              ["<", ["get", "value"], _this.nodemin],
+              "#ffffff", //<10.8
+              ["<", ["get", "value"], _this.nodemin + ll * _this.nodestep],
+              "#fdd519", //>=10.8 & <17.2
+              [
+                "<",
+                ["get", "value"],
+                _this.nodemin + (ll + 1) * _this.nodestep,
+              ],
+              "#f8a114",
+              [
+                "<",
+                ["get", "value"],
+                _this.nodemin + (ll + 2) * _this.nodestep,
+              ],
+              "#f36f0f",
+              [
+                "<=",
+                ["get", "value"],
+                _this.nodemin + (ll + 3) * _this.nodestep,
+              ],
+              "#ee430b",
+              [
+                "<=",
+                ["get", "value"],
+                _this.nodemin + (ll + 4) * _this.nodestep,
+              ],
+              "#e90806", //>=41.5 & <50.1
+              "#e90806", // 默认值, >=50.1
+            ],
+          },
+          filter: ["in", "$type", "Point"],
+        });
+        _this.SetPop(_this.layerNumber);
+        _this.layerNumber++;
+
+        // slider
+        _this.timeSliderMap = false;
+        _this.maxSlider = _this.rptResult.Date.length;
+        _this.marks = {
+          1: _this.formatTooltip(1),
+        };
+        // btn
+        _this.startBtn = false;
+        _this.conduitStartBtn = false;
+        setTimeout(function () {
+          _this.loading = false;
+        }, 300);
+      });
     },
     Npopclick(e) {
       e.preventDefault();
@@ -654,8 +781,6 @@ export default {
     SetPop(layerN) {
       if (this.map._listeners.click) {
         if (this.map._listeners.click.length > 0) {
-          console.log(this.map._listeners);
-
           this.map.off(
             "click",
             "vectorLayer" + layerN + "point",
@@ -881,24 +1006,47 @@ export default {
 };
 </script>
 
-<style>
+<style scope>
 .el-tabs__content {
-  height: 80%;
+  height: 90%;
 }
 .el-tabs__nav.is-left {
   display: flex;
-  flex-flow: column;
+  flex-direction: column;
+  align-content: center;
   height: 100%;
 }
 .el-tabs__item.is-left {
   flex: 1;
 }
-.select {
+.spart {
   display: flex;
+  width: 100%;
+  height: 100%;
 }
-.el-select {
+.select {
   flex: 1;
-  padding: 5px;
+  height: 100%;;
+}
+.el-radio-group {
+  width: 80%;
+}
+.radioDiv {
+  align-items: stretch;
+  flex-direction: column;
+  height: 80%;
+}
+.el-radio-button {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}
+.el-radio-button__inner {
+  width: 100%;
+  height: 100%;
+  line-height: height;
+  border-radius: 6px !important;
+  border: 0 !important;
 }
 #map {
   height: calc(100vh - 120px);
@@ -918,8 +1066,8 @@ export default {
 }
 .tool {
   background: white;
-  height: 60%;
-  width: 30%;
+  height: 50%;
+  width: 25%;
   position: absolute;
   /* top: 40%; */
   z-index: 1000;
