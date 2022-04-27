@@ -1005,7 +1005,7 @@ export default {
 
 <style scope>
 .el-tabs__content {
-  height: 80%;
+  height: 90%;
 }
 .el-tabs__nav.is-left {
   display: flex;
@@ -1019,9 +1019,11 @@ export default {
 .spart {
   display: flex;
   width: 100%;
+  height: 100%;
 }
 .select {
   flex: 1;
+  height: 100%;;
 }
 .el-radio-group {
   width: 80%;
@@ -1032,14 +1034,14 @@ export default {
   height: 80%;
 }
 .el-radio-button {
+  flex: 1;
   width: 100%;
-  margin-top: 10px;
-}
-.el-radio-button .is-active {
-  fill: #73ad21;
+  height: 100%;
 }
 .el-radio-button__inner {
   width: 100%;
+  height: 100%;
+  line-height: height;
   border-radius: 6px !important;
   border: 0 !important;
 }
