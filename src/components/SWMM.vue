@@ -25,7 +25,7 @@
           @tab-click="handleClick"
           stretch
         >
-          <el-tab-pane label="72mm" name="quo_5" style="height: 100%">
+          <el-tab-pane label="72mm" name="quo_5" >
             <div class="spart">
               <div class="select">
                 <div><h3>选择点属性</h3></div>
@@ -1004,16 +1004,21 @@ export default {
 </script>
 
 <style scope>
+.el-tab-pane{
+  height: 100%;
+}
 .el-tabs__content {
   height: 90%;
 }
 .el-tabs__nav.is-left {
   display: flex;
   flex-direction: column;
-  align-content: center;
   height: 100%;
 }
 .el-tabs__item.is-left {
+  display: flex !important;
+  align-items: center !important; 
+  justify-content: center !important;
   flex: 1;
 }
 .spart {
@@ -1023,7 +1028,7 @@ export default {
 }
 .select {
   flex: 1;
-  height: 100%;;
+  height: 100%;
 }
 .el-radio-group {
   width: 80%;
@@ -1031,6 +1036,8 @@ export default {
 .radioDiv {
   align-items: stretch;
   flex-direction: column;
+  align-items: center; 
+  justify-content: center;
   height: 80%;
 }
 .el-radio-button {
@@ -1044,6 +1051,9 @@ export default {
   line-height: height;
   border-radius: 6px !important;
   border: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 #map {
   height: calc(100vh - 120px);
@@ -1063,7 +1073,7 @@ export default {
 }
 .tool {
   background: white;
-  height: 50%;
+  height: 60%;
   width: 25%;
   position: absolute;
   /* top: 40%; */
