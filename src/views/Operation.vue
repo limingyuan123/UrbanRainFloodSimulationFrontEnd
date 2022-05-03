@@ -160,7 +160,7 @@
     </el-dialog>
 
     <el-dialog
-      title="配置耦合文档"
+      title="配置对象化模块体系文档"
       v-model="deployDocument"
       width="50%"
       :before-close="handleCloseDeployDocument"

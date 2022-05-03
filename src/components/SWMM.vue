@@ -299,7 +299,10 @@
 
         <!-- File -->
       </el-tab-pane>
-      <el-tab-pane label="流向图" name="second">Operation</el-tab-pane>
+      <!-- <el-tab-pane label="水深图" name="second"> -->
+        <!-- 按照热力图处理水深数据 -->
+        
+      <!-- </el-tab-pane> -->
       <!-- <el-tab-pane label="Simulation" name="third">Simulation</el-tab-pane>
         <el-tab-pane label="Coupling analysis" name="fourth">Coupling analysis</el-tab-pane> -->
     </el-tabs>
@@ -475,7 +478,7 @@ export default {
       let data = y;
       let date = x;
       // 指定图表的配置项和数据
-      var option1 = {
+      let option1 = {
         tooltip: {
           trigger: "axis",
         },

@@ -20,20 +20,20 @@
         active-text-color="#ffd04b"
       >
         <el-menu-item index="1" style="margin-left:20%" @click="toHome"
-          >Home</el-menu-item
+          >主页</el-menu-item
         >
         <el-menu-item index="2" @click="toOperation"
-          >Operation</el-menu-item
+          >操作</el-menu-item
         >
         <el-menu-item index="3" @click="toShow"
-          >Show</el-menu-item
+          >展示</el-menu-item
         >
         <el-menu-item index="4" @click="turnToHelp"
-          >Help</el-menu-item
+          >帮助</el-menu-item
         >
         <el-menu-item index="5"
           ><a href="http://opengmsteam.com/" target="_blank"
-            >About us</a
+            >关于我们</a
           ></el-menu-item
         >
         <el-menu-item v-show="!this.$store.state.Authorization" index="7" style="margin-left: 40%;">
