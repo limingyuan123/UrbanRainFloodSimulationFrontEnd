@@ -11,7 +11,6 @@
   >
     <el-tabs
       v-model="activeName"
-      @tab-click="handleClick"
       type="card"
       style="height: 100%"
       stretch
@@ -25,7 +24,7 @@
           @tab-click="handleClick"
           stretch
         >
-          <el-tab-pane label="72mm" name="quo_5" >
+          <el-tab-pane label="72mm" name="quo_5">
             <div class="spart">
               <div class="select">
                 <div><h3>选择点属性</h3></div>
@@ -513,6 +512,11 @@ export default {
       this.echar.clear();
       this.echar.setOption(option1);
     },
+    stopLoading(_this) {
+      setTimeout(function () {
+        _this.loading = false;
+      }, 300);
+    },
     openFileDialog(disp_url, geo_url) {
       this.loading = true;
       let f = this.getrptResult(this, disp_url);
@@ -708,9 +712,7 @@ export default {
         // btn
         _this.startBtn = false;
         _this.conduitStartBtn = false;
-        setTimeout(function () {
-          _this.loading = false;
-        }, 300);
+        _this.stopLoading(_this);
       });
     },
     Npopclick(e) {
@@ -1004,7 +1006,7 @@ export default {
 </script>
 
 <style scope>
-.el-tab-pane{
+.el-tab-pane {
   height: 100%;
 }
 .el-tabs__content {
@@ -1017,7 +1019,7 @@ export default {
 }
 .el-tabs__item.is-left {
   display: flex !important;
-  align-items: center !important; 
+  align-items: center !important;
   justify-content: center !important;
   flex: 1;
 }
@@ -1036,7 +1038,7 @@ export default {
 .radioDiv {
   align-items: stretch;
   flex-direction: column;
-  align-items: center; 
+  align-items: center;
   justify-content: center;
   height: 80%;
 }
@@ -1074,7 +1076,7 @@ export default {
 .tool {
   background: white;
   height: 60%;
-  width: 25%;
+  width: 495px;
   position: absolute;
   /* top: 40%; */
   z-index: 1000;
