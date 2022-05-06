@@ -20,12 +20,13 @@
         <el-tab-pane label="管网图" name="first" style="height: 100%">
           <el-tabs
             v-loading="loading"
+            v-model="activeName1"
             tab-position="left"
             style="height: 100%"
             @tab-click="handleClick"
             stretch
           >
-            <el-tab-pane label="72mm" name="quo_5" >
+            <el-tab-pane label="72mm" name="quo_5">
               <div class="spart">
                 <div class="select">
                   <div><h3>选择点属性</h3></div>
@@ -300,15 +301,20 @@
           <!-- File -->
         </el-tab-pane>
         <!-- <el-tab-pane label="水深图" name="second"> -->
-          <!-- 按照热力图处理水深数据 -->
-          
+        <!-- 按照热力图处理水深数据 -->
+
         <!-- </el-tab-pane> -->
         <!-- <el-tab-pane label="Simulation" name="third">Simulation</el-tab-pane>
           <el-tab-pane label="Coupling analysis" name="fourth">Coupling analysis</el-tab-pane> -->
       </el-tabs>
       <div
         id="time-slider"
-        style="background: white; border-radius: 15px; width: 100%; bottom: -20%"
+        style="
+          background: white;
+          border-radius: 15px;
+          width: 100%;
+          bottom: -20%;
+        "
       >
         <el-slider
           v-model="timeSlider"
@@ -318,13 +324,23 @@
           :max="maxSlider"
           :marks="marks"
           :format-tooltip="formatTooltip"
-          style="width: 80%; margin: auto"
+          style="width: 80%; margin: auto;left: 15px;"
         >
         </el-slider>
-        <el-button size="small" round @click="startAnimation" :disabled="startBtn"
+        <el-button
+          size="small"
+          round
+          style="margin-bottom: 5px !important"
+          @click="startAnimation"
+          :disabled="startBtn"
           >Start</el-button
         >
-        <el-button size="small" round @click="pauseAnimation" :disabled="pauseBtn"
+        <el-button
+          size="small"
+          round
+          style="margin-bottom: 5px !important"
+          @click="pauseAnimation"
+          :disabled="pauseBtn"
           >Pause</el-button
         >
       </div>
@@ -337,8 +353,8 @@
 import "mapbox-gl/dist/mapbox-gl.css";
 import "mapbox-gl";
 import * as echarts from "echarts";
-import $ from 'jquery';
-import axios from 'axios'
+import $ from "jquery";
+import axios from "axios";
 import { reactive, ref, toRefs, onMounted } from "vue";
 //定义变量使用
 const mapboxgl = require("mapbox-gl");
@@ -347,14 +363,15 @@ let showInPop = reactive({
   NT_showInPop: "Inflow",
   LT_showInPop: "Flow",
 });
-let {NT_showInPop, LT_showInPop} = toRefs(showInPop);
+let { NT_showInPop, LT_showInPop } = toRefs(showInPop);
 let dialog = reactive({
   fileDialog: false,
   propertySelectVisible: false,
   swmmVisualDialog: false,
   echartsDialog: false,
 });
-let {fileDialog, propertySelectVisible, swmmVisualDialog, echartsDialog} = toRefs(dialog);
+let { fileDialog, propertySelectVisible, swmmVisualDialog, echartsDialog } =
+  toRefs(dialog);
 let rptResult = ref({});
 let isCollapse = true;
 let loading = ref(false);
@@ -362,26 +379,28 @@ let uploadFiles = ref([]);
 let selData = [];
 let selTitle = "";
 let geojson = ref("");
-let geojsonObject =  ref({});
+let geojsonObject = ref({});
 let geojsonLayer = Object;
 let viewer = Object;
-let fileList =  ref([]);
+let fileList = ref([]);
 let flag = ref(-1);
 let activeName = ref("first");
-let dispArr =  [];
-let dispJSON =  {};
+let activeName1 = ref("quo_5");
+let dispArr = [];
+let dispJSON = {};
 let timeSlider = ref(0);
 let timeSliderMap = ref(true);
 let layerNumber = ref(0);
 let nodeLinkInit = reactive({
-  nodemin:0,
-  nodemax:0,
-  nodestep:1,
-  linkmin:0,
-  linkmax:0,
-  linkstep:1,
+  nodemin: 0,
+  nodemax: 0,
+  nodestep: 1,
+  linkmin: 0,
+  linkmax: 0,
+  linkstep: 1,
 });
-let {nodemin, nodemax, nodestep, linkmin, linkmax, linkstep} = toRefs(nodeLinkInit);
+let { nodemin, nodemax, nodestep, linkmin, linkmax, linkstep } =
+  toRefs(nodeLinkInit);
 let maxSlider = ref(10);
 let marks = ref({});
 let map = ref({});
@@ -401,11 +420,11 @@ let options = ref([
 ]);
 let linkResultArr = ref([]);
 let btn = reactive({
-  startBtn:true,
-  pauseBtn:true,
-  conduitStartBtn:true,
-})
-let {startBtn, pauseBtn, conduitStartBtn} = toRefs(btn);
+  startBtn: true,
+  pauseBtn: true,
+  conduitStartBtn: true,
+});
+let { startBtn, pauseBtn, conduitStartBtn } = toRefs(btn);
 let intevalAnima = ref(null);
 let curDateIndex = 0;
 let curYear = "5year";
@@ -422,9 +441,10 @@ let LinkPopType = [
   { value: "Capacity" },
 ];
 
-
 onMounted(() => {
-    initmap();
+  initmap();
+  openFileDialog(`${activeName1.value}.disp`, "quo.geojson")
+  loading.value=false
 });
 const initmap = () => {
   mapboxgl.accessToken =
@@ -601,12 +621,8 @@ const openFileDialog = (disp_url, geo_url) => {
     }
     changeChooseMap();
     if (layerNumber.value > 0) {
-      map.value.removeLayer(
-        `vectorLayer${layerNumber.value - 1}line`
-      );
-      map.value.removeLayer(
-        `vectorLayer${layerNumber.value - 1}point`
-      );
+      map.value.removeLayer(`vectorLayer${layerNumber.value - 1}line`);
+      map.value.removeLayer(`vectorLayer${layerNumber.value - 1}point`);
       map.value.removeSource(`source-id${layerNumber.value - 1}`);
 
       layerNumber.value--;
@@ -626,7 +642,11 @@ const openFileDialog = (disp_url, geo_url) => {
           "case",
           ["<", ["get", "value"], nodeLinkInit.linkmin],
           "#ffffff", //<10.8
-          ["<", ["get", "value"], nodeLinkInit.linkmin + ll * nodeLinkInit.linkstep],
+          [
+            "<",
+            ["get", "value"],
+            nodeLinkInit.linkmin + ll * nodeLinkInit.linkstep,
+          ],
           "#51e1e6", //>=10.8 & <17.2
           [
             "<",
@@ -667,7 +687,11 @@ const openFileDialog = (disp_url, geo_url) => {
           "case",
           ["<", ["get", "value"], nodeLinkInit.nodemin],
           "#ffffff", //<10.8
-          ["<", ["get", "value"], nodeLinkInit.nodemin + ll * nodeLinkInit.nodestep],
+          [
+            "<",
+            ["get", "value"],
+            nodeLinkInit.nodemin + ll * nodeLinkInit.nodestep,
+          ],
           "#fdd519", //>=10.8 & <17.2
           [
             "<",
@@ -744,7 +768,7 @@ const Npopclick = (e) => {
 };
 const LPopclick = (e) => {
   if (e.defaultPrevented) {
-    console.log('');
+    console.log("");
   } else {
     // Copy coordinates array.
     const coordinates = e.features[0].geometry.coordinates.slice();
@@ -763,9 +787,7 @@ const LPopclick = (e) => {
     let x = rptResult.value.Date;
     new mapboxgl.Popup({ maxWidth: "800px" })
       .setLngLat(e.lngLat)
-      .setHTML(
-        "<div id='e_chart_L' style='height:400px;width:600px;'></div>"
-      )
+      .setHTML("<div id='e_chart_L' style='height:400px;width:600px;'></div>")
       .addTo(map.value);
     setTimeout(() => {
       initEchart(x, y, "e_chart_L", showInPop.LT_showInPop);
@@ -781,36 +803,12 @@ const mleave = () => {
 const SetPop = (layerN) => {
   if (map.value._listeners.click) {
     if (map.value._listeners.click.length > 0) {
-      map.value.off(
-        "click",
-        `vectorLayer${layerN}point`,
-        Npopclick
-      );
-      map.value.off(
-        "click",
-        `vectorLayer${layerN}line`,
-        LPopclick
-      );
-      map.value.off(
-        "mouseenter",
-        `vectorLayer${layerN}point`,
-        menter
-      );
-      map.value.off(
-        "mouseleave",
-        `vectorLayer${layerN}point`,
-        mleave
-      );
-      map.value.off(
-        "mouseenter",
-        `vectorLayer${layerN}line`,
-        menter
-      );
-      map.value.off(
-        "mouseleave",
-        `vectorLayer${layerN}line`,
-        mleave
-      );
+      map.value.off("click", `vectorLayer${layerN}point`, Npopclick);
+      map.value.off("click", `vectorLayer${layerN}line`, LPopclick);
+      map.value.off("mouseenter", `vectorLayer${layerN}point`, menter);
+      map.value.off("mouseleave", `vectorLayer${layerN}point`, mleave);
+      map.value.off("mouseenter", `vectorLayer${layerN}line`, menter);
+      map.value.off("mouseleave", `vectorLayer${layerN}line`, mleave);
     }
   }
   map.value.on("mouseenter", `vectorLayer${layerN}point`, menter);
@@ -853,7 +851,8 @@ const changeChooseMap = () => {
   }
   for (let linkItem = 0; linkItem < rptResult.value.Link.length; linkItem++) {
     // 更新geojsonObject
-    let feat = geojsonObject.value.features[rptResult.value.Node.length + linkItem];
+    let feat =
+      geojsonObject.value.features[rptResult.value.Node.length + linkItem];
     feat.properties.value = linkResultArr.value[linkItem][0];
   }
   // 获取最大最小值
@@ -978,8 +977,7 @@ const startAnimation = () => {
     }
     for (let k = 0; k < rptResult.value.Link.length; k++) {
       // 更新geojsonObject
-      let feat =
-        geojsonObject.value.features[rptResult.value.Node.length + k];
+      let feat = geojsonObject.value.features[rptResult.value.Node.length + k];
       geojsonObject.value.features[
         rptResult.value.Node.length + k
       ].properties.value = linkResultArr.value[k][numberAnima.value];
@@ -996,12 +994,12 @@ const pauseAnimation = () => {
 
   clearInterval(intevalAnima);
 };
-  // },
+// },
 // };
 </script>
 
 <style scope>
-.el-tab-pane{
+.el-tab-pane {
   height: 100%;
 }
 .el-tabs__content {
@@ -1014,7 +1012,7 @@ const pauseAnimation = () => {
 }
 .el-tabs__item.is-left {
   display: flex !important;
-  align-items: center !important; 
+  align-items: center !important;
   justify-content: center !important;
   flex: 1;
 }
@@ -1033,7 +1031,7 @@ const pauseAnimation = () => {
 .radioDiv {
   align-items: stretch;
   flex-direction: column;
-  align-items: center; 
+  align-items: center;
   justify-content: center;
   height: 80%;
 }
@@ -1083,7 +1081,9 @@ const pauseAnimation = () => {
   transition: width 2s;
   transition: height 2s;
 }
-
+.el-slider__marks-text{
+  left: 5% !important;
+}
 #time-slider {
   text-align: center;
   z-index: 10000;
