@@ -5,7 +5,8 @@
         <navbar></navbar>
       </div>
       <div class="mapContainer">
-        <swmm></swmm>
+        <!-- <swmm></swmm> -->
+        <swmmcopy></swmmcopy>
       </div>
   </div>
 </template>
@@ -15,6 +16,7 @@ import LeftMenu from '../components/LeftMenu'
 import Navbar  from '../components/Navbar'
 import Lisflood from '../components/LISFLOOD-FP'
 import Swmm from '../components/SWMM'
+import Swmmcopy from '../components/SWMMCopy'
 </script>
 
 <style scoped>
