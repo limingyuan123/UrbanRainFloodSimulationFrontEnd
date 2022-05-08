@@ -324,7 +324,7 @@
           :max="maxSlider"
           :marks="marks"
           :format-tooltip="formatTooltip"
-          style="width: 80%; margin: auto;left: 15px;"
+          style="width: 80%; margin: auto; left: 15px"
         >
         </el-slider>
         <el-button
@@ -443,8 +443,8 @@ let LinkPopType = [
 
 onMounted(() => {
   initmap();
-  openFileDialog(`${activeName1.value}.disp`, "quo.geojson")
-  loading.value=false
+  openFileDialog(`${activeName1.value}.disp`, "quo.geojson");
+  loading.value = false;
 });
 const initmap = () => {
   mapboxgl.accessToken =
@@ -620,124 +620,251 @@ const openFileDialog = (disp_url, geo_url) => {
       options.value[1].children.push(child);
     }
     changeChooseMap();
-    if (layerNumber.value > 0) {
-      map.value.removeLayer(`vectorLayer${layerNumber.value - 1}line`);
-      map.value.removeLayer(`vectorLayer${layerNumber.value - 1}point`);
-      map.value.removeSource(`source-id${layerNumber.value - 1}`);
-
-      layerNumber.value--;
+    if (!map.value._listeners.load) {
+      map.value.on("load", function () {
+        readlayer();
+      });
+    } else {
+      readlayer();
     }
-    map.value.addSource(`source-id${layerNumber.value}`, {
-      type: "geojson",
-      data: geojsonObject.value,
-    });
-    let ll = 1;
-    map.value.addLayer({
-      id: `vectorLayer${layerNumber.value}line`,
-      type: "line",
-      source: `source-id${layerNumber.value}`,
-      paint: {
-        "line-width": 3,
-        "line-color": [
-          "case",
-          ["<", ["get", "value"], nodeLinkInit.linkmin],
-          "#ffffff", //<10.8
-          [
-            "<",
-            ["get", "value"],
-            nodeLinkInit.linkmin + ll * nodeLinkInit.linkstep,
-          ],
-          "#51e1e6", //>=10.8 & <17.2
-          [
-            "<",
-            ["get", "value"],
-            nodeLinkInit.linkmin + (ll + 1) * nodeLinkInit.linkstep,
-          ],
-          "#40a9d9",
-          [
-            "<",
-            ["get", "value"],
-            nodeLinkInit.linkmin + (ll + 2) * nodeLinkInit.linkstep,
-          ],
-          "#3175ce",
-          [
-            "<=",
-            ["get", "value"],
-            nodeLinkInit.linkmin + (ll + 3) * nodeLinkInit.linkstep,
-          ],
-          "#2549c4",
-          [
-            "<=",
-            ["get", "value"],
-            nodeLinkInit.linkmin + (ll + 4) * nodeLinkInit.linkstep,
-          ],
-          "#140fb8", //>=41.5 & <50.1
-          "#140fb8", // 默认值, >=50.1
-        ],
-      },
-      filter: ["in", "$type", "LineString"],
-    });
-
-    map.value.addLayer({
-      id: `vectorLayer${layerNumber.value}point`,
-      type: "circle",
-      source: `source-id${layerNumber.value}`,
-      paint: {
-        "circle-color": [
-          "case",
-          ["<", ["get", "value"], nodeLinkInit.nodemin],
-          "#ffffff", //<10.8
-          [
-            "<",
-            ["get", "value"],
-            nodeLinkInit.nodemin + ll * nodeLinkInit.nodestep,
-          ],
-          "#fdd519", //>=10.8 & <17.2
-          [
-            "<",
-            ["get", "value"],
-            nodeLinkInit.nodemin + (ll + 1) * nodeLinkInit.nodestep,
-          ],
-          "#f8a114",
-          [
-            "<",
-            ["get", "value"],
-            nodeLinkInit.nodemin + (ll + 2) * nodeLinkInit.nodestep,
-          ],
-          "#f36f0f",
-          [
-            "<=",
-            ["get", "value"],
-            nodeLinkInit.nodemin + (ll + 3) * nodeLinkInit.nodestep,
-          ],
-          "#ee430b",
-          [
-            "<=",
-            ["get", "value"],
-            nodeLinkInit.nodemin + (ll + 4) * nodeLinkInit.nodestep,
-          ],
-          "#e90806", //>=41.5 & <50.1
-          "#e90806", // 默认值, >=50.1
-        ],
-      },
-      filter: ["in", "$type", "Point"],
-    });
-    SetPop(layerNumber.value);
-    layerNumber.value++;
-
-    // slider
-    timeSliderMap.value = false;
-    maxSlider.value = rptResult.value.Date.length;
-    marks.value = {
-      1: formatTooltip(1),
-    };
-    // btn
-    btn.startBtn = false;
-    btn.conduitStartBtn = false;
-    setTimeout(function () {
-      loading.value = false;
-    }, 300);
   });
+};
+    // if (layerNumber.value > 0) {
+    //   map.value.removeLayer(`vectorLayer${layerNumber.value - 1}line`);
+    //   map.value.removeLayer(`vectorLayer${layerNumber.value - 1}point`);
+    //   map.value.removeSource(`source-id${layerNumber.value - 1}`);
+
+    //   layerNumber.value--;
+    // }
+    // map.value.addSource(`source-id${layerNumber.value}`, {
+    //   type: "geojson",
+    //   data: geojsonObject.value,
+    // });
+    // let ll = 1;
+    // map.value.addLayer({
+    //   id: `vectorLayer${layerNumber.value}line`,
+    //   type: "line",
+    //   source: `source-id${layerNumber.value}`,
+    //   paint: {
+    //     "line-width": 3,
+    //     "line-color": [
+    //       "case",
+    //       ["<", ["get", "value"], nodeLinkInit.linkmin],
+    //       "#ffffff", //<10.8
+    //       [
+    //         "<",
+    //         ["get", "value"],
+    //         nodeLinkInit.linkmin + ll * nodeLinkInit.linkstep,
+    //       ],
+    //       "#51e1e6", //>=10.8 & <17.2
+    //       [
+    //         "<",
+    //         ["get", "value"],
+    //         nodeLinkInit.linkmin + (ll + 1) * nodeLinkInit.linkstep,
+    //       ],
+    //       "#40a9d9",
+    //       [
+    //         "<",
+    //         ["get", "value"],
+    //         nodeLinkInit.linkmin + (ll + 2) * nodeLinkInit.linkstep,
+    //       ],
+    //       "#3175ce",
+    //       [
+    //         "<=",
+    //         ["get", "value"],
+    //         nodeLinkInit.linkmin + (ll + 3) * nodeLinkInit.linkstep,
+    //       ],
+    //       "#2549c4",
+    //       [
+    //         "<=",
+    //         ["get", "value"],
+    //         nodeLinkInit.linkmin + (ll + 4) * nodeLinkInit.linkstep,
+    //       ],
+    //       "#140fb8", //>=41.5 & <50.1
+    //       "#140fb8", // 默认值, >=50.1
+    //     ],
+    //   },
+    //   filter: ["in", "$type", "LineString"],
+    // });
+
+    // map.value.addLayer({
+    //   id: `vectorLayer${layerNumber.value}point`,
+    //   type: "circle",
+    //   source: `source-id${layerNumber.value}`,
+    //   paint: {
+    //     "circle-color": [
+    //       "case",
+    //       ["<", ["get", "value"], nodeLinkInit.nodemin],
+    //       "#ffffff", //<10.8
+    //       [
+    //         "<",
+    //         ["get", "value"],
+    //         nodeLinkInit.nodemin + ll * nodeLinkInit.nodestep,
+    //       ],
+    //       "#fdd519", //>=10.8 & <17.2
+    //       [
+    //         "<",
+    //         ["get", "value"],
+    //         nodeLinkInit.nodemin + (ll + 1) * nodeLinkInit.nodestep,
+    //       ],
+    //       "#f8a114",
+    //       [
+    //         "<",
+    //         ["get", "value"],
+    //         nodeLinkInit.nodemin + (ll + 2) * nodeLinkInit.nodestep,
+    //       ],
+    //       "#f36f0f",
+    //       [
+    //         "<=",
+    //         ["get", "value"],
+    //         nodeLinkInit.nodemin + (ll + 3) * nodeLinkInit.nodestep,
+    //       ],
+    //       "#ee430b",
+    //       [
+    //         "<=",
+    //         ["get", "value"],
+    //         nodeLinkInit.nodemin + (ll + 4) * nodeLinkInit.nodestep,
+    //       ],
+    //       "#e90806", //>=41.5 & <50.1
+    //       "#e90806", // 默认值, >=50.1
+    //     ],
+    //   },
+    //   filter: ["in", "$type", "Point"],
+    // });
+    // SetPop(layerNumber.value);
+    // layerNumber.value++;
+
+    // // slider
+    // timeSliderMap.value = false;
+    // maxSlider.value = rptResult.value.Date.length;
+    // marks.value = {
+    //   1: formatTooltip(1),
+    // };
+    // // btn
+    // btn.startBtn = false;
+    // btn.conduitStartBtn = false;
+    // setTimeout(function () {
+    //   loading.value = false;
+    // }, 300);
+
+const readlayer = () => {
+  if (layerNumber.value > 0) {
+    map.value.removeLayer(`vectorLayer${layerNumber.value - 1}line`);
+    map.value.removeLayer(`vectorLayer${layerNumber.value - 1}point`);
+    map.value.removeSource(`source-id${layerNumber.value - 1}`);
+
+    layerNumber.value--;
+  }
+  map.value.addSource(`source-id${layerNumber.value}`, {
+    type: "geojson",
+    data: geojsonObject.value,
+  });
+  let ll = 1;
+  map.value.addLayer({
+    id: `vectorLayer${layerNumber.value}line`,
+    type: "line",
+    source: `source-id${layerNumber.value}`,
+    paint: {
+      "line-width": 3,
+      "line-color": [
+        "case",
+        ["<", ["get", "value"], nodeLinkInit.linkmin],
+        "#ffffff", //<10.8
+        [
+          "<",
+          ["get", "value"],
+          nodeLinkInit.linkmin + ll * nodeLinkInit.linkstep,
+        ],
+        "#51e1e6", //>=10.8 & <17.2
+        [
+          "<",
+          ["get", "value"],
+          nodeLinkInit.linkmin + (ll + 1) * nodeLinkInit.linkstep,
+        ],
+        "#40a9d9",
+        [
+          "<",
+          ["get", "value"],
+          nodeLinkInit.linkmin + (ll + 2) * nodeLinkInit.linkstep,
+        ],
+        "#3175ce",
+        [
+          "<=",
+          ["get", "value"],
+          nodeLinkInit.linkmin + (ll + 3) * nodeLinkInit.linkstep,
+        ],
+        "#2549c4",
+        [
+          "<=",
+          ["get", "value"],
+          nodeLinkInit.linkmin + (ll + 4) * nodeLinkInit.linkstep,
+        ],
+        "#140fb8", //>=41.5 & <50.1
+        "#140fb8", // 默认值, >=50.1
+      ],
+    },
+    filter: ["in", "$type", "LineString"],
+  });
+
+  map.value.addLayer({
+    id: `vectorLayer${layerNumber.value}point`,
+    type: "circle",
+    source: `source-id${layerNumber.value}`,
+    paint: {
+      "circle-color": [
+        "case",
+        ["<", ["get", "value"], nodeLinkInit.nodemin],
+        "#ffffff", //<10.8
+        [
+          "<",
+          ["get", "value"],
+          nodeLinkInit.nodemin + ll * nodeLinkInit.nodestep,
+        ],
+        "#fdd519", //>=10.8 & <17.2
+        [
+          "<",
+          ["get", "value"],
+          nodeLinkInit.nodemin + (ll + 1) * nodeLinkInit.nodestep,
+        ],
+        "#f8a114",
+        [
+          "<",
+          ["get", "value"],
+          nodeLinkInit.nodemin + (ll + 2) * nodeLinkInit.nodestep,
+        ],
+        "#f36f0f",
+        [
+          "<=",
+          ["get", "value"],
+          nodeLinkInit.nodemin + (ll + 3) * nodeLinkInit.nodestep,
+        ],
+        "#ee430b",
+        [
+          "<=",
+          ["get", "value"],
+          nodeLinkInit.nodemin + (ll + 4) * nodeLinkInit.nodestep,
+        ],
+        "#e90806", //>=41.5 & <50.1
+        "#e90806", // 默认值, >=50.1
+      ],
+    },
+    filter: ["in", "$type", "Point"],
+  });
+  SetPop(layerNumber.value);
+  layerNumber.value++;
+
+  // slider
+  timeSliderMap.value = false;
+  maxSlider.value = rptResult.value.Date.length;
+  marks.value = {
+    1: formatTooltip(1),
+  };
+  // btn
+  btn.startBtn = false;
+  btn.conduitStartBtn = false;
+  setTimeout(function () {
+    loading.value = false;
+  }, 300);
 };
 const Npopclick = (e) => {
   e.preventDefault();
@@ -1081,7 +1208,7 @@ const pauseAnimation = () => {
   transition: width 2s;
   transition: height 2s;
 }
-.el-slider__marks-text{
+.el-slider__marks-text {
   left: 5% !important;
 }
 #time-slider {
