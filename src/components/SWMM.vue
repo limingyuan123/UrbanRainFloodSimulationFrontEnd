@@ -620,10 +620,11 @@ const initstate = (disp_url, geo_url) => {
       options.value[1].children.push(child);
     }
     updateData();
+    sliderChange(1);
     initmap();
     map.value.setZoom(14);
     map.value.setCenter({ lng: 120.845, lat: 31.037 });
-    sliderChange(1);
+
     map.value.on("load", () => {
       readlayer();
     });
