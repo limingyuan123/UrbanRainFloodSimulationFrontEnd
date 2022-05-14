@@ -70,10 +70,8 @@
         </el-dropdown>
       </div>
     </div>
-    <router-view></router-view>
-    <!-- end -->
-    <div id="footer" class="fixed-bottom">
-      <footer data-v-0ef2f3f6="" style="backgroud:#135571;">
+    <div id="footer" class="fixed-bottom" style="z-index: 100;height: 60px;">
+      <footer data-v-0ef2f3f6="" style="background-color:#135571;">
         <h2 data-v-0ef2f3f6="" class="footerTop" style="margin-bottom: 0px;">
           <i data-v-0ef2f3f6="" style="font-size:initial">
             Open Geographic Modeling and Simulation</i>
@@ -84,6 +82,9 @@
       </footer>
     </div>
   </div>
+    <router-view></router-view>
+    <!-- end -->
+    
 </template>
 
 <script setup>
