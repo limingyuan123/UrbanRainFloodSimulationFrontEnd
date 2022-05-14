@@ -62,7 +62,7 @@
         >
       </div>
     </div>
-    <div id="map" class="swmmMap"></div>
+    <div id="map" class="swmmMap" ></div>
   </div>
 </template>
 <script setup>
@@ -936,10 +936,6 @@ const pauseAnimation = () => {
   align-items: center !important;
   justify-content: center !important;
 }
-.swmmMap {
-  height: calc(100vh);
-}
-
 .mapboxgl-popup {
   max-width: 800px;
   font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;

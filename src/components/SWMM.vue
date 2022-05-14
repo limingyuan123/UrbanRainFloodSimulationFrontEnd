@@ -1213,7 +1213,8 @@ const pauseAnimation = () => {
   justify-content: center !important;
 }
 .swmmMap {
-  height: calc(100vh);
+  height: calc(90vh);
+  width: 100%;
 }
 
 .mapboxgl-popup {
