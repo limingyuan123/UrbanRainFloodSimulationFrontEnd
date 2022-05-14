@@ -764,7 +764,7 @@ const loadLisfloodResult = () => {
         floodMaxMin.floodmin,
         "rgba(0,0,0,0)", //<10.8
         floodMaxMin.floodmin + ll * floodMaxMin.floodstep,
-        'rgb(0,0,230)', //>=10.8 & <17.2
+        'rgb(0,0,255)', //>=10.8 & <17.2
         floodMaxMin.floodmin + (ll + 1) * floodMaxMin.floodstep,
         'rgb(0,0,219)',
         floodMaxMin.floodmin + (ll + 2) * floodMaxMin.floodstep,
