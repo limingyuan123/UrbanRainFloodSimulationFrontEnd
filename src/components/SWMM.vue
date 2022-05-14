@@ -370,6 +370,7 @@ let dialog = reactive({
   swmmVisualDialog: false,
   echartsDialog: false,
 });
+let floodObject = ref({});
 let { fileDialog, propertySelectVisible, swmmVisualDialog, echartsDialog } =
   toRefs(dialog);
 let rptResult = ref({});
@@ -391,6 +392,8 @@ let dispJSON = {};
 let timeSlider = ref(0);
 let timeSliderMap = ref(true);
 let layerNumber = ref(0);
+let lisfloodLayerNumber = ref(5);
+let lisfloodrptResult = ref({});
 let nodeLinkInit = reactive({
   nodemin: 0,
   nodemax: 0,
@@ -440,10 +443,14 @@ let LinkPopType = [
   { value: "Depth" },
   { value: "Capacity" },
 ];
-
+let floodMaxMin = reactive({ floodmax: 1, floodmin: 0, floodstep: 0 });
 onMounted(() => {
   // initmap();
-  initstate(`${activeName1.value}.disp`, "quo.geojson");
+  initstate(
+    `${activeName1.value}.disp`,
+    "quo.geojson",
+    `geojson/Export_Output${lisfloodLayerNumber.value}.json`
+  );
   loading.value = false;
 });
 const initmap = () => {
@@ -535,15 +542,34 @@ const initEchart = (x, y, id, chart_name) => {
   echar.value.clear();
   echar.value.setOption(option1);
 };
-const initstate = (disp_url, geo_url) => {
+const initstate = (disp_url, geo_url, flood_url) => {
   pauseAnimation();
-  loading.value = true;
   let f = getrptResult(disp_url);
   let ff = getGeojson(geo_url);
-
-  Promise.all([f, ff]).then((array) => {
+  let fff = getGeojson(flood_url);
+  Promise.all([f, ff, fff]).then((array) => {
     rptResult.value = array[0];
     geojsonObject.value = array[1];
+    floodObject.value = array[2];
+    floodMaxMin.floodmax = floodObject.value.features[0].properties.RASTERVALU;
+    floodMaxMin.floodmin = floodObject.value.features[0].properties.RASTERVALU;
+    for (let i = 0; i < floodObject.value.features.length; i++) {
+      if (
+        floodMaxMin.floodmax <
+        floodObject.value.features[i].properties.RASTERVALU
+      ) {
+        floodMaxMin.floodmax =
+          floodObject.value.features[i].properties.RASTERVALU;
+      }
+      if (
+        floodMaxMin.floodmin >
+        floodObject.value.features[i].properties.RASTERVALU
+      ) {
+        floodMaxMin.floodmin =
+          floodObject.value.features[i].properties.RASTERVALU;
+      }
+    }
+    floodMaxMin.floodstep = (floodMaxMin.floodmax - floodMaxMin.floodmin) / 5;
     options.value = [
       {
         value: "node",
@@ -627,6 +653,7 @@ const initstate = (disp_url, geo_url) => {
 
     map.value.on("load", () => {
       readlayer();
+      loadLisfloodResult();
     });
   });
 };
@@ -716,6 +743,39 @@ const openFileDialog = (disp_url, geo_url) => {
     }
     changeChooseMap();
     readlayer();
+  });
+};
+const loadLisfloodResult = () => {
+  map.value.addSource("lisflood-source-id", {
+    type: "geojson",
+    data: floodObject.value,
+  });
+  let ll = 1;
+  map.value.addLayer({
+    id: "lisflood-heat",
+    type: "heatmap",
+    source: "lisflood-source-id",
+    paint: {
+      // increase the radius of the circle as the zoom level and dbh value increases
+      "heatmap-color": [
+        "interpolate",
+        ["linear"],
+        ["heatmap-density"],
+        floodMaxMin.floodmin,
+        "rgba(0,0,0,0)", //<10.8
+        floodMaxMin.floodmin + ll * floodMaxMin.floodstep,
+        'rgb(0,0,230)', //>=10.8 & <17.2
+        floodMaxMin.floodmin + (ll + 1) * floodMaxMin.floodstep,
+        'rgb(0,0,219)',
+        floodMaxMin.floodmin + (ll + 2) * floodMaxMin.floodstep,
+        'rgb(0,0,207)',
+        floodMaxMin.floodmin + (ll + 3) * floodMaxMin.floodstep,
+        'rgb(0,0,153)',
+        floodMaxMin.floodmin + (ll + 4) * floodMaxMin.floodstep,
+        'rgb(0,0,153)',
+      ],
+      'heatmap-opacity': 0.6
+    },
   });
 };
 const readlayer = () => {
@@ -833,9 +893,7 @@ const readlayer = () => {
   // btn
   btn.startBtn = false;
   btn.conduitStartBtn = false;
-  setTimeout(function () {
-    loading.value = false;
-  }, 300);
+  loading.value = false;
 };
 const Npopclick = (e) => {
   e.preventDefault();
@@ -866,7 +924,6 @@ const Npopclick = (e) => {
 };
 const LPopclick = (e) => {
   if (e.defaultPrevented) {
-    console.log("");
   } else {
     // Copy coordinates array.
     const coordinates = e.features[0].geometry.coordinates.slice();
@@ -1032,6 +1089,10 @@ const refreshOpenlayer = () => {
   map.value
     .getSource(`source-id${layerNumber.value - 1}`)
     .setData(geojsonObject.value);
+  let number =Math.floor(numberAnima.value / 19)+5;
+  map.value
+    .getSource(`lisflood-source-id`)
+    .setData(`geojson/Export_Output${number}.json`);
 };
 const formatTooltip = (val) => {
   if (rptResult.value.Date != undefined) {
